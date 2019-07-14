@@ -1,0 +1,38 @@
+{
+  "deploy_settings": {
+    "allen": {
+      "skill_id": "amzn1.ask.skill.66eb11d8-013f-4fca-b655-494dbeba291b",
+      "was_cloned": true,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "41641aea30321ab2ebbc810979b07c33"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "1ccbbe1a0af3c9f7801d1bbf39f93ee1"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:681242437315:function:stKillian",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/us-east-1_stKillian",
+            "functionName": "stKillian",
+            "handler": "lambda_function.lambda_handler",
+            "revisionId": "c8e2b849-fe5a-4fcb-aec9-3b69566c8109",
+            "runtime": "python3.7"
+          }
+        ]
+      }
+    },
+    "default": {
+      "skill_id": "",
+      "was_cloned": false,
+      "merge": {}
+    }
+  }
+}
