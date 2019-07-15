@@ -22,8 +22,8 @@
             "awsRegion": "us-east-1",
             "codeUri": "lambda/us-east-1_stKillian",
             "functionName": "stKillian",
-            "handler": "lambda_function.lambda_handler",
-            "revisionId": "c8e2b849-fe5a-4fcb-aec9-3b69566c8109",
+            "handler": "app.handler",
+            "revisionId": "8c1b4651-f686-4910-baaa-5623857bbeb5",
             "runtime": "python3.7"
           }
         ]
