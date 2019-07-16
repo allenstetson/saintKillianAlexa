@@ -90,12 +90,18 @@ class Mass(object):
             speech += tSpeech
         else:
             i = 0
+            print("-- Times: {}".format(times))
             bestMass = times[i][0]
+            print("-- Best mass: {}".format(bestMass))
+            print("-- nowTime: {}".format(nowTime))
             while nowTime < bestMass:
+                print("-- Advancing to next mass")
                 i += 1
                 bestMass = times[i][0]
+            print("-- Chosen Mass {}".format(bestMass))
             massString = convertMassToString(bestMass, language=times[i][1])
             speech = "The next mass today will be at {}".format(massString)
+            reprompt = "What else can I do for you?"
         title = "Next Mass"
         text = speech
         cardImage = None
