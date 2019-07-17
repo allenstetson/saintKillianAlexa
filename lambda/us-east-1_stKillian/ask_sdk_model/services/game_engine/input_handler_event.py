@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.input_event import InputEvent
 
@@ -38,12 +38,12 @@ class InputHandlerEvent(object):
     deserialized_types = {
         'name': 'str',
         'input_events': 'list[ask_sdk_model.services.game_engine.input_event.InputEvent]'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'name': 'name',
         'input_events': 'inputEvents'
-    }
+    }  # type: Dict
 
     def __init__(self, name=None, input_events=None):
         # type: (Optional[str], Optional[List[InputEvent]]) -> None
@@ -54,7 +54,7 @@ class InputHandlerEvent(object):
         :param input_events: A chronologically ordered report of the raw Button Events that contributed to this Input Handler Event.
         :type input_events: (optional) list[ask_sdk_model.services.game_engine.input_event.InputEvent]
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.name = name
         self.input_events = input_events
@@ -62,7 +62,7 @@ class InputHandlerEvent(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

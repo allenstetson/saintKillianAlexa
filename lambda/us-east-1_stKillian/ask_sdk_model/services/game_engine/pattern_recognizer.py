@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.services.game_engine.recognizer import Recognizer
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.pattern import Pattern
     from ask_sdk_model.services.game_engine.pattern_recognizer_anchor_type import PatternRecognizerAnchorType
@@ -52,7 +52,7 @@ class PatternRecognizer(Recognizer):
         'gadget_ids': 'list[str]',
         'actions': 'list[str]',
         'pattern': 'list[ask_sdk_model.services.game_engine.pattern.Pattern]'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
@@ -61,7 +61,7 @@ class PatternRecognizer(Recognizer):
         'gadget_ids': 'gadgetIds',
         'actions': 'actions',
         'pattern': 'pattern'
-    }
+    }  # type: Dict
 
     def __init__(self, anchor=None, fuzzy=None, gadget_ids=None, actions=None, pattern=None):
         # type: (Optional[PatternRecognizerAnchorType], Optional[bool], Optional[List[object]], Optional[List[object]], Optional[List[Pattern]]) -> None
@@ -78,7 +78,7 @@ class PatternRecognizer(Recognizer):
         :param pattern: An object that provides all of the events that need to occur, in a specific order, for this recognizer to be true. Omitting any parameters in this object means \&quot;match anything\&quot;.
         :type pattern: (optional) list[ask_sdk_model.services.game_engine.pattern.Pattern]
         """
-        self.__discriminator_value = "match"
+        self.__discriminator_value = "match"  # type: str
 
         self.object_type = self.__discriminator_value
         super(PatternRecognizer, self).__init__(object_type=self.__discriminator_value)
@@ -91,7 +91,7 @@ class PatternRecognizer(Recognizer):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

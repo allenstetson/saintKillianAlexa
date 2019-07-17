@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.ui.output_speech import OutputSpeech
 
@@ -35,11 +35,11 @@ class Reprompt(object):
     """
     deserialized_types = {
         'output_speech': 'ask_sdk_model.ui.output_speech.OutputSpeech'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'output_speech': 'outputSpeech'
-    }
+    }  # type: Dict
 
     def __init__(self, output_speech=None):
         # type: (Optional[OutputSpeech]) -> None
@@ -48,14 +48,14 @@ class Reprompt(object):
         :param output_speech: 
         :type output_speech: (optional) ask_sdk_model.ui.output_speech.OutputSpeech
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.output_speech = output_speech
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

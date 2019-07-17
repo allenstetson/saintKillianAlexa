@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.display.template import Template
 
@@ -37,12 +37,12 @@ class RenderTemplateDirective(Directive):
     deserialized_types = {
         'object_type': 'str',
         'template': 'ask_sdk_model.interfaces.display.template.Template'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'template': 'template'
-    }
+    }  # type: Dict
 
     def __init__(self, template=None):
         # type: (Optional[Template]) -> None
@@ -51,7 +51,7 @@ class RenderTemplateDirective(Directive):
         :param template: 
         :type template: (optional) ask_sdk_model.interfaces.display.template.Template
         """
-        self.__discriminator_value = "Display.RenderTemplate"
+        self.__discriminator_value = "Display.RenderTemplate"  # type: str
 
         self.object_type = self.__discriminator_value
         super(RenderTemplateDirective, self).__init__(object_type=self.__discriminator_value)
@@ -60,7 +60,7 @@ class RenderTemplateDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

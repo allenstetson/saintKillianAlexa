@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.directive.header import Header
     from ask_sdk_model.services.directive.directive import Directive
@@ -41,12 +41,12 @@ class SendDirectiveRequest(object):
     deserialized_types = {
         'header': 'ask_sdk_model.services.directive.header.Header',
         'directive': 'ask_sdk_model.services.directive.directive.Directive'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'header': 'header',
         'directive': 'directive'
-    }
+    }  # type: Dict
 
     def __init__(self, header=None, directive=None):
         # type: (Optional[Header], Optional[Directive]) -> None
@@ -57,7 +57,7 @@ class SendDirectiveRequest(object):
         :param directive: Directive Content.
         :type directive: (optional) ask_sdk_model.services.directive.directive.Directive
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.header = header
         self.directive = directive
@@ -65,7 +65,7 @@ class SendDirectiveRequest(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

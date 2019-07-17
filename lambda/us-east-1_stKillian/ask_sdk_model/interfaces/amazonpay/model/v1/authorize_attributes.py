@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.v1.price import Price
 
@@ -49,7 +49,7 @@ class AuthorizeAttributes(object):
         'transaction_timeout': 'int',
         'seller_authorization_note': 'str',
         'soft_descriptor': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'authorization_reference_id': 'authorizationReferenceId',
@@ -57,7 +57,7 @@ class AuthorizeAttributes(object):
         'transaction_timeout': 'transactionTimeout',
         'seller_authorization_note': 'sellerAuthorizationNote',
         'soft_descriptor': 'softDescriptor'
-    }
+    }  # type: Dict
 
     def __init__(self, authorization_reference_id=None, authorization_amount=None, transaction_timeout=None, seller_authorization_note=None, soft_descriptor=None):
         # type: (Optional[str], Optional[Price], Optional[int], Optional[str], Optional[str]) -> None
@@ -74,7 +74,7 @@ class AuthorizeAttributes(object):
         :param soft_descriptor: The description to be shown on the user&#39;s payment instrument statement if AuthorizeAndCapture is chosen. Format of soft descriptor sent to the payment processor is \&quot;AMZ* &lt;soft descriptor specified here&gt;\&quot;. Default is \&quot;AMZ*&lt;SELLER_NAME&gt; amzn.com/ pmts WA\&quot;. Maximum length can be 16 characters.
         :type soft_descriptor: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.authorization_reference_id = authorization_reference_id
         self.authorization_amount = authorization_amount
@@ -85,7 +85,7 @@ class AuthorizeAttributes(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

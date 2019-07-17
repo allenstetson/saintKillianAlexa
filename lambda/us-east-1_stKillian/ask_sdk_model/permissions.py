@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.scope import Scope
 
@@ -31,7 +31,7 @@ class Permissions(object):
     Contains a consentToken allowing the skill access to information that the customer has consented to provide, such as address information. Note that the consentToken is deprecated. Use the apiAccessToken available in the context object to determine the user’s permissions.
 
 
-    :param consent_token: A token listing all the permissions granted for this user
+    :param consent_token: A token listing all the permissions granted for this user.
     :type consent_token: (optional) str
     :param scopes: A map where the key is a LoginWithAmazon(LWA) scope and value is a list of key:value pairs which describe the state of user actions on the LWA scope. For e.g. \&quot;scopes\&quot; :{ \&quot;alexa::devices:all:geolocation:read\&quot;:{\&quot;status\&quot;:\&quot;GRANTED\&quot;}} This value of \&quot;alexa::devices:all:geolocation:read\&quot; will determine if the Geolocation data access is granted by the user, or else it will show a card of type AskForPermissionsConsent to the user to get this permission.
     :type scopes: (optional) dict(str, ask_sdk_model.scope.Scope)
@@ -40,23 +40,23 @@ class Permissions(object):
     deserialized_types = {
         'consent_token': 'str',
         'scopes': 'dict(str, ask_sdk_model.scope.Scope)'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'consent_token': 'consentToken',
         'scopes': 'scopes'
-    }
+    }  # type: Dict
 
     def __init__(self, consent_token=None, scopes=None):
         # type: (Optional[str], Optional[Dict[str, Scope]]) -> None
         """Contains a consentToken allowing the skill access to information that the customer has consented to provide, such as address information. Note that the consentToken is deprecated. Use the apiAccessToken available in the context object to determine the user’s permissions.
 
-        :param consent_token: A token listing all the permissions granted for this user
+        :param consent_token: A token listing all the permissions granted for this user.
         :type consent_token: (optional) str
         :param scopes: A map where the key is a LoginWithAmazon(LWA) scope and value is a list of key:value pairs which describe the state of user actions on the LWA scope. For e.g. \&quot;scopes\&quot; :{ \&quot;alexa::devices:all:geolocation:read\&quot;:{\&quot;status\&quot;:\&quot;GRANTED\&quot;}} This value of \&quot;alexa::devices:all:geolocation:read\&quot; will determine if the Geolocation data access is granted by the user, or else it will show a card of type AskForPermissionsConsent to the user to get this permission.
         :type scopes: (optional) dict(str, ask_sdk_model.scope.Scope)
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.consent_token = consent_token
         self.scopes = scopes
@@ -64,7 +64,7 @@ class Permissions(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

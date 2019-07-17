@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.recognizer import Recognizer
     from ask_sdk_model.services.game_engine.event import Event
@@ -47,7 +47,7 @@ class StartInputHandlerDirective(Directive):
         'proxies': 'list[str]',
         'recognizers': 'dict(str, ask_sdk_model.services.game_engine.recognizer.Recognizer)',
         'events': 'dict(str, ask_sdk_model.services.game_engine.event.Event)'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
@@ -55,7 +55,7 @@ class StartInputHandlerDirective(Directive):
         'proxies': 'proxies',
         'recognizers': 'recognizers',
         'events': 'events'
-    }
+    }  # type: Dict
 
     def __init__(self, timeout=None, proxies=None, recognizers=None, events=None):
         # type: (Optional[int], Optional[List[object]], Optional[Dict[str, Recognizer]], Optional[Dict[str, Event]]) -> None
@@ -70,7 +70,7 @@ class StartInputHandlerDirective(Directive):
         :param events: The logic that determines when your skill is notified of Echo Button input. Events are listed here as object keys, where the keys specify the name of an event. 
         :type events: (optional) dict(str, ask_sdk_model.services.game_engine.event.Event)
         """
-        self.__discriminator_value = "GameEngine.StartInputHandler"
+        self.__discriminator_value = "GameEngine.StartInputHandler"  # type: str
 
         self.object_type = self.__discriminator_value
         super(StartInputHandlerDirective, self).__init__(object_type=self.__discriminator_value)
@@ -82,7 +82,7 @@ class StartInputHandlerDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.request import Request
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.system.error import Error
     from ask_sdk_model.interfaces.system.error_cause import ErrorCause
@@ -35,59 +35,58 @@ class ExceptionEncounteredRequest(Request):
     :type request_id: (optional) str
     :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
     :type timestamp: (optional) datetime
+    :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+    :type locale: (optional) str
     :param error: 
     :type error: (optional) ask_sdk_model.interfaces.system.error.Error
     :param cause: 
     :type cause: (optional) ask_sdk_model.interfaces.system.error_cause.ErrorCause
-    :param locale: A string indicating the user’s locale. For example: en-US.
-    :type locale: (optional) str
 
     """
     deserialized_types = {
         'object_type': 'str',
         'request_id': 'str',
         'timestamp': 'datetime',
+        'locale': 'str',
         'error': 'ask_sdk_model.interfaces.system.error.Error',
-        'cause': 'ask_sdk_model.interfaces.system.error_cause.ErrorCause',
-        'locale': 'str'
-    }
+        'cause': 'ask_sdk_model.interfaces.system.error_cause.ErrorCause'
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'request_id': 'requestId',
         'timestamp': 'timestamp',
+        'locale': 'locale',
         'error': 'error',
-        'cause': 'cause',
-        'locale': 'locale'
-    }
+        'cause': 'cause'
+    }  # type: Dict
 
-    def __init__(self, request_id=None, timestamp=None, error=None, cause=None, locale=None):
-        # type: (Optional[str], Optional[datetime], Optional[Error], Optional[ErrorCause], Optional[str]) -> None
+    def __init__(self, request_id=None, timestamp=None, locale=None, error=None, cause=None):
+        # type: (Optional[str], Optional[datetime], Optional[str], Optional[Error], Optional[ErrorCause]) -> None
         """
 
         :param request_id: Represents the unique identifier for the specific request.
         :type request_id: (optional) str
         :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
         :type timestamp: (optional) datetime
+        :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+        :type locale: (optional) str
         :param error: 
         :type error: (optional) ask_sdk_model.interfaces.system.error.Error
         :param cause: 
         :type cause: (optional) ask_sdk_model.interfaces.system.error_cause.ErrorCause
-        :param locale: A string indicating the user’s locale. For example: en-US.
-        :type locale: (optional) str
         """
-        self.__discriminator_value = "System.ExceptionEncountered"
+        self.__discriminator_value = "System.ExceptionEncountered"  # type: str
 
         self.object_type = self.__discriminator_value
-        super(ExceptionEncounteredRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp)
+        super(ExceptionEncounteredRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp, locale=locale)
         self.error = error
         self.cause = cause
-        self.locale = locale
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

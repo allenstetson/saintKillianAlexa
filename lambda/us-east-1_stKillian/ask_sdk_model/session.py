@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.application import Application
     from ask_sdk_model.user import User
@@ -50,7 +50,7 @@ class Session(object):
         'user': 'ask_sdk_model.user.User',
         'attributes': 'dict(str, object)',
         'application': 'ask_sdk_model.application.Application'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'new': 'new',
@@ -58,7 +58,7 @@ class Session(object):
         'user': 'user',
         'attributes': 'attributes',
         'application': 'application'
-    }
+    }  # type: Dict
 
     def __init__(self, new=None, session_id=None, user=None, attributes=None, application=None):
         # type: (Optional[bool], Optional[str], Optional[User], Optional[Dict[str, object]], Optional[Application]) -> None
@@ -75,7 +75,7 @@ class Session(object):
         :param application: 
         :type application: (optional) ask_sdk_model.application.Application
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.new = new
         self.session_id = session_id
@@ -86,7 +86,7 @@ class Session(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

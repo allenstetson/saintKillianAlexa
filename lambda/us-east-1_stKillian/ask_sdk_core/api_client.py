@@ -67,7 +67,12 @@ class DefaultApiClient(ApiClient):
                     "Requests against non-HTTPS endpoints are not allowed.")
 
             if request.body:
-                raw_data = json.dumps(request.body)
+                body_content_type = http_headers.get("Content-type", None)
+                if (body_content_type is not None and
+                        "json" in body_content_type):
+                    raw_data = json.dumps(request.body)
+                else:
+                    raw_data = request.body
             else:
                 raw_data = None
 
@@ -113,7 +118,7 @@ class DefaultApiClient(ApiClient):
             as comma separated strings
         :rtype: Dict[str, str]
         """
-        headers_dict = {}
+        headers_dict = {}  # type: Dict
         if headers_list is not None:
             for header_tuple in headers_list:
                 key, value = header_tuple[0], header_tuple[1]

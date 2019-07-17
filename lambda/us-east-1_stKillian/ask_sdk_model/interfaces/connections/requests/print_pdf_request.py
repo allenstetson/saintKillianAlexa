@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.connections.requests.base_request import BaseReque
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -47,7 +47,7 @@ class PrintPDFRequest(BaseRequest):
         'title': 'str',
         'url': 'str',
         'description': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': '@type',
@@ -55,7 +55,7 @@ class PrintPDFRequest(BaseRequest):
         'title': 'title',
         'url': 'url',
         'description': 'description'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, title=None, url=None, description=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str]) -> None
@@ -70,7 +70,7 @@ class PrintPDFRequest(BaseRequest):
         :param description: description of the image
         :type description: (optional) str
         """
-        self.__discriminator_value = "PrintPDFRequest"
+        self.__discriminator_value = "PrintPDFRequest"  # type: str
 
         self.object_type = self.__discriminator_value
         super(PrintPDFRequest, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -81,7 +81,7 @@ class PrintPDFRequest(BaseRequest):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

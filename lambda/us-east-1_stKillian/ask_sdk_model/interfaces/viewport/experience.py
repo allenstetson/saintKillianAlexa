@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -45,14 +45,14 @@ class Experience(object):
         'arc_minute_height': 'float',
         'can_rotate': 'bool',
         'can_resize': 'bool'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'arc_minute_width': 'arcMinuteWidth',
         'arc_minute_height': 'arcMinuteHeight',
         'can_rotate': 'canRotate',
         'can_resize': 'canResize'
-    }
+    }  # type: Dict
 
     def __init__(self, arc_minute_width=None, arc_minute_height=None, can_rotate=None, can_resize=None):
         # type: (Optional[float], Optional[float], Optional[bool], Optional[bool]) -> None
@@ -67,7 +67,7 @@ class Experience(object):
         :param can_resize: Indicates if the viewport can be resized, limiting the area which can be used to render the APL response.
         :type can_resize: (optional) bool
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.arc_minute_width = arc_minute_width
         self.arc_minute_height = arc_minute_height
@@ -77,7 +77,7 @@ class Experience(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.videoapp.video_item import VideoItem
 
@@ -37,12 +37,12 @@ class LaunchDirective(Directive):
     deserialized_types = {
         'object_type': 'str',
         'video_item': 'ask_sdk_model.interfaces.videoapp.video_item.VideoItem'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'video_item': 'videoItem'
-    }
+    }  # type: Dict
 
     def __init__(self, video_item=None):
         # type: (Optional[VideoItem]) -> None
@@ -51,7 +51,7 @@ class LaunchDirective(Directive):
         :param video_item: 
         :type video_item: (optional) ask_sdk_model.interfaces.videoapp.video_item.VideoItem
         """
-        self.__discriminator_value = "VideoApp.Launch"
+        self.__discriminator_value = "VideoApp.Launch"  # type: str
 
         self.object_type = self.__discriminator_value
         super(LaunchDirective, self).__init__(object_type=self.__discriminator_value)
@@ -60,7 +60,7 @@ class LaunchDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

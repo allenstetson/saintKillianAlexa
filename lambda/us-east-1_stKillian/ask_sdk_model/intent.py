@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.intent_confirmation_status import IntentConfirmationStatus
     from ask_sdk_model.slot import Slot
@@ -44,13 +44,13 @@ class Intent(object):
         'name': 'str',
         'slots': 'dict(str, ask_sdk_model.slot.Slot)',
         'confirmation_status': 'ask_sdk_model.intent_confirmation_status.IntentConfirmationStatus'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'name': 'name',
         'slots': 'slots',
         'confirmation_status': 'confirmationStatus'
-    }
+    }  # type: Dict
 
     def __init__(self, name=None, slots=None, confirmation_status=None):
         # type: (Optional[str], Optional[Dict[str, Slot]], Optional[IntentConfirmationStatus]) -> None
@@ -63,7 +63,7 @@ class Intent(object):
         :param confirmation_status: 
         :type confirmation_status: (optional) ask_sdk_model.intent_confirmation_status.IntentConfirmationStatus
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.name = name
         self.slots = slots
@@ -72,7 +72,7 @@ class Intent(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

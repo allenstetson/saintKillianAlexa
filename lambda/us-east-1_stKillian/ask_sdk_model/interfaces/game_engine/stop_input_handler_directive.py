@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -36,12 +36,12 @@ class StopInputHandlerDirective(Directive):
     deserialized_types = {
         'object_type': 'str',
         'originating_request_id': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'originating_request_id': 'originatingRequestId'
-    }
+    }  # type: Dict
 
     def __init__(self, originating_request_id=None):
         # type: (Optional[str]) -> None
@@ -50,7 +50,7 @@ class StopInputHandlerDirective(Directive):
         :param originating_request_id: The &#x60;requestId&#x60; of the request that started the input handler.
         :type originating_request_id: (optional) str
         """
-        self.__discriminator_value = "GameEngine.StopInputHandler"
+        self.__discriminator_value = "GameEngine.StopInputHandler"  # type: str
 
         self.object_type = self.__discriminator_value
         super(StopInputHandlerDirective, self).__init__(object_type=self.__discriminator_value)
@@ -59,7 +59,7 @@ class StopInputHandlerDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

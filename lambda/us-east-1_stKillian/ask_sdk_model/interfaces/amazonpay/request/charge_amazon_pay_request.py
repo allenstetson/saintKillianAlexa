@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.request.payment_action import PaymentAction
     from ask_sdk_model.interfaces.amazonpay.model.request.seller_order_attributes import SellerOrderAttributes
@@ -35,7 +35,7 @@ class ChargeAmazonPayRequest(BaseAmazonPayEntity):
     Charge Amazon Pay Request Object.
 
 
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
     :param seller_id: The seller ID (also known as merchant ID). If you are an Ecommerce Provider (Solution Provider), please specify the ID of the merchant, not your provider ID.
     :type seller_id: (optional) str
@@ -60,7 +60,7 @@ class ChargeAmazonPayRequest(BaseAmazonPayEntity):
         'authorize_attributes': 'ask_sdk_model.interfaces.amazonpay.model.request.authorize_attributes.AuthorizeAttributes',
         'seller_order_attributes': 'ask_sdk_model.interfaces.amazonpay.model.request.seller_order_attributes.SellerOrderAttributes',
         'provider_attributes': 'ask_sdk_model.interfaces.amazonpay.model.request.provider_attributes.ProviderAttributes'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': '@type',
@@ -71,13 +71,13 @@ class ChargeAmazonPayRequest(BaseAmazonPayEntity):
         'authorize_attributes': 'authorizeAttributes',
         'seller_order_attributes': 'sellerOrderAttributes',
         'provider_attributes': 'providerAttributes'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, seller_id=None, billing_agreement_id=None, payment_action=None, authorize_attributes=None, seller_order_attributes=None, provider_attributes=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[PaymentAction], Optional[AuthorizeAttributes], Optional[SellerOrderAttributes], Optional[ProviderAttributes]) -> None
         """Charge Amazon Pay Request Object.
 
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         :param seller_id: The seller ID (also known as merchant ID). If you are an Ecommerce Provider (Solution Provider), please specify the ID of the merchant, not your provider ID.
         :type seller_id: (optional) str
@@ -92,7 +92,7 @@ class ChargeAmazonPayRequest(BaseAmazonPayEntity):
         :param provider_attributes: 
         :type provider_attributes: (optional) ask_sdk_model.interfaces.amazonpay.model.request.provider_attributes.ProviderAttributes
         """
-        self.__discriminator_value = "ChargeAmazonPayRequest"
+        self.__discriminator_value = "ChargeAmazonPayRequest"  # type: str
 
         self.object_type = self.__discriminator_value
         super(ChargeAmazonPayRequest, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -106,7 +106,7 @@ class ChargeAmazonPayRequest(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

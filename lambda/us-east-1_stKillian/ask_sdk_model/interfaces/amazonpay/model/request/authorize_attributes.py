@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.request.price import Price
 
@@ -42,7 +42,7 @@ class AuthorizeAttributes(BaseAmazonPayEntity):
     :type seller_authorization_note: (optional) str
     :param soft_descriptor: The description to be shown on the user&#39;s payment instrument statement if AuthorizeAndCapture is chosen. Format of soft descriptor sent to the payment processor is \&quot;AMZ* &lt;soft descriptor specified here&gt;\&quot;. Default is \&quot;AMZ*&lt;SELLER_NAME&gt; amzn.com/ pmts WA\&quot;. Maximum length can be 16 characters.
     :type soft_descriptor: (optional) str
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
 
     """
@@ -54,7 +54,7 @@ class AuthorizeAttributes(BaseAmazonPayEntity):
         'soft_descriptor': 'str',
         'object_type': 'str',
         'version': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'authorization_reference_id': 'authorizationReferenceId',
@@ -64,7 +64,7 @@ class AuthorizeAttributes(BaseAmazonPayEntity):
         'soft_descriptor': 'softDescriptor',
         'object_type': '@type',
         'version': '@version'
-    }
+    }  # type: Dict
 
     def __init__(self, authorization_reference_id=None, authorization_amount=None, transaction_timeout=None, seller_authorization_note=None, soft_descriptor=None, version=None):
         # type: (Optional[str], Optional[Price], Optional[int], Optional[str], Optional[str], Optional[str]) -> None
@@ -80,10 +80,10 @@ class AuthorizeAttributes(BaseAmazonPayEntity):
         :type seller_authorization_note: (optional) str
         :param soft_descriptor: The description to be shown on the user&#39;s payment instrument statement if AuthorizeAndCapture is chosen. Format of soft descriptor sent to the payment processor is \&quot;AMZ* &lt;soft descriptor specified here&gt;\&quot;. Default is \&quot;AMZ*&lt;SELLER_NAME&gt; amzn.com/ pmts WA\&quot;. Maximum length can be 16 characters.
         :type soft_descriptor: (optional) str
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         """
-        self.__discriminator_value = "AuthorizeAttributes"
+        self.__discriminator_value = "AuthorizeAttributes"  # type: str
 
         self.object_type = self.__discriminator_value
         super(AuthorizeAttributes, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -96,7 +96,7 @@ class AuthorizeAttributes(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

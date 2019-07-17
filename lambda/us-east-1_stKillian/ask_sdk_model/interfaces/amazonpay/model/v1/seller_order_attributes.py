@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -45,14 +45,14 @@ class SellerOrderAttributes(object):
         'store_name': 'str',
         'custom_information': 'str',
         'seller_note': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'seller_order_id': 'sellerOrderId',
         'store_name': 'storeName',
         'custom_information': 'customInformation',
         'seller_note': 'sellerNote'
-    }
+    }  # type: Dict
 
     def __init__(self, seller_order_id=None, store_name=None, custom_information=None, seller_note=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str]) -> None
@@ -67,7 +67,7 @@ class SellerOrderAttributes(object):
         :param seller_note: This represents a description of the order that is displayed in emails to the buyer.
         :type seller_note: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.seller_order_id = seller_order_id
         self.store_name = store_name
@@ -77,7 +77,7 @@ class SellerOrderAttributes(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

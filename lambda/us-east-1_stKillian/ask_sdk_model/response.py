@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.canfulfill.can_fulfill_intent import CanFulfillIntent
     from ask_sdk_model.ui.card import Card
@@ -54,7 +54,7 @@ class Response(object):
         'directives': 'list[ask_sdk_model.directive.Directive]',
         'should_end_session': 'bool',
         'can_fulfill_intent': 'ask_sdk_model.canfulfill.can_fulfill_intent.CanFulfillIntent'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'output_speech': 'outputSpeech',
@@ -63,7 +63,7 @@ class Response(object):
         'directives': 'directives',
         'should_end_session': 'shouldEndSession',
         'can_fulfill_intent': 'canFulfillIntent'
-    }
+    }  # type: Dict
 
     def __init__(self, output_speech=None, card=None, reprompt=None, directives=None, should_end_session=None, can_fulfill_intent=None):
         # type: (Optional[OutputSpeech], Optional[Card], Optional[Reprompt], Optional[List[Directive]], Optional[bool], Optional[CanFulfillIntent]) -> None
@@ -82,7 +82,7 @@ class Response(object):
         :param can_fulfill_intent: 
         :type can_fulfill_intent: (optional) ask_sdk_model.canfulfill.can_fulfill_intent.CanFulfillIntent
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.output_speech = output_speech
         self.card = card
@@ -94,7 +94,7 @@ class Response(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

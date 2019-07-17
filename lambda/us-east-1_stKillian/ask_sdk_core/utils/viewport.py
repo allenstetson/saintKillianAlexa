@@ -69,6 +69,7 @@ class Size(OrderedEnum):
 
 class ViewportProfile(Enum):
     HUB_ROUND_SMALL = "HUB_ROUND_SMALL"
+    HUB_LANDSCAPE_SMALL = "HUB_LANDSCAPE_SMALL"
     HUB_LANDSCAPE_MEDIUM = "HUB_LANDSCAPE_MEDIUM"
     HUB_LANDSCAPE_LARGE = "HUB_LANDSCAPE_LARGE"
     MOBILE_LANDSCAPE_SMALL = "MOBILE_LANDSCAPE_SMALL"
@@ -87,7 +88,7 @@ def get_orientation(width, height):
 
     :type width: int
     :type height: int
-    :return viewport orientation enum
+    :return: viewport orientation enum
     :rtype: Orientation
     """
     if width > height:
@@ -103,7 +104,7 @@ def get_size(size):
     """Get viewport size from given size.
 
     :type size: int
-    :return viewport size enum
+    :return: viewport size enum
     :rtype: Size
     """
     if size in range(0, 600):
@@ -125,7 +126,7 @@ def get_dpi_group(dpi):
     """Get viewport density group from given dpi.
 
     :type dpi: int
-    :return viewport density group enum
+    :return: viewport density group enum
     :rtype: Density
     """
     if dpi in range(0, 121):
@@ -157,8 +158,8 @@ def get_viewport_profile(request_envelope):
 
     :param request_envelope: The alexa request envelope object
     :type request_envelope: ask_sdk_model.request_envelope.RequestEnvelope
-    :return Calculated Viewport Profile enum
-    :rtype ViewportProfile
+    :return: Calculated Viewport Profile enum
+    :rtype: ViewportProfile
     """
     viewport_state = request_envelope.context.viewport
     if viewport_state:
@@ -179,6 +180,13 @@ def get_viewport_profile(request_envelope):
                 and pixel_width_size_group is Size.XSMALL
                 and pixel_height_size_group is Size.XSMALL):
             return ViewportProfile.HUB_ROUND_SMALL
+
+        elif (shape is Shape.RECTANGLE
+                and orientation is Orientation.LANDSCAPE
+                and dpi_group is Density.LOW
+                and pixel_width_size_group <= Size.MEDIUM
+                and pixel_height_size_group <= Size.XSMALL):
+            return ViewportProfile.HUB_LANDSCAPE_SMALL
 
         elif (shape is Shape.RECTANGLE
                 and orientation is Orientation.LANDSCAPE

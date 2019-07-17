@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.v1.price import Price
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -40,12 +40,12 @@ class Price(Price):
     deserialized_types = {
         'amount': 'str',
         'currency_code': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'amount': 'amount',
         'currency_code': 'currencyCode'
-    }
+    }  # type: Dict
 
     def __init__(self, amount=None, currency_code=None):
         # type: (Optional[str], Optional[str]) -> None
@@ -56,14 +56,14 @@ class Price(Price):
         :param currency_code: Currency code for the amount.
         :type currency_code: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         super(Price, self).__init__(amount=amount, currency_code=currency_code)
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

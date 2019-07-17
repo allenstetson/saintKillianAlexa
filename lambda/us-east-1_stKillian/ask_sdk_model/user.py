@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.permissions import Permissions
 
@@ -33,7 +33,7 @@ class User(object):
 
     :param user_id: A string that represents a unique identifier for the user who made the request. The length of this identifier can vary, but is never more than 255 characters. The userId is automatically generated when a user enables the skill in the Alexa app. Note: Disabling and re-enabling a skill generates a new identifier.
     :type user_id: (optional) str
-    :param access_token:  a token identifying the user in another system. This is only provided if the user has successfully linked their account. See Linking an Alexa User with a User in Your System for more details.
+    :param access_token: A token identifying the user in another system. This is only provided if the user has successfully linked their account. See Linking an Alexa User with a User in Your System for more details.
     :type access_token: (optional) str
     :param permissions: 
     :type permissions: (optional) ask_sdk_model.permissions.Permissions
@@ -43,13 +43,13 @@ class User(object):
         'user_id': 'str',
         'access_token': 'str',
         'permissions': 'ask_sdk_model.permissions.Permissions'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'user_id': 'userId',
         'access_token': 'accessToken',
         'permissions': 'permissions'
-    }
+    }  # type: Dict
 
     def __init__(self, user_id=None, access_token=None, permissions=None):
         # type: (Optional[str], Optional[str], Optional[Permissions]) -> None
@@ -57,12 +57,12 @@ class User(object):
 
         :param user_id: A string that represents a unique identifier for the user who made the request. The length of this identifier can vary, but is never more than 255 characters. The userId is automatically generated when a user enables the skill in the Alexa app. Note: Disabling and re-enabling a skill generates a new identifier.
         :type user_id: (optional) str
-        :param access_token:  a token identifying the user in another system. This is only provided if the user has successfully linked their account. See Linking an Alexa User with a User in Your System for more details.
+        :param access_token: A token identifying the user in another system. This is only provided if the user has successfully linked their account. See Linking an Alexa User with a User in Your System for more details.
         :type access_token: (optional) str
         :param permissions: 
         :type permissions: (optional) ask_sdk_model.permissions.Permissions
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.user_id = user_id
         self.access_token = access_token
@@ -71,7 +71,7 @@ class User(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

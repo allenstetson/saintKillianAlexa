@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -40,13 +40,13 @@ class AnimationStep(object):
         'duration_ms': 'int',
         'color': 'str',
         'blend': 'bool'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'duration_ms': 'durationMs',
         'color': 'color',
         'blend': 'blend'
-    }
+    }  # type: Dict
 
     def __init__(self, duration_ms=None, color=None, blend=None):
         # type: (Optional[int], Optional[str], Optional[bool]) -> None
@@ -59,7 +59,7 @@ class AnimationStep(object):
         :param blend: A boolean that indicates whether to interpolate from the previous color into this one over the course of this directive&#39;s durationMs.
         :type blend: (optional) bool
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.duration_ms = duration_ms
         self.color = color
@@ -68,7 +68,7 @@ class AnimationStep(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

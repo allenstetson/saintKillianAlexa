@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -37,7 +37,7 @@ class SellerBillingAgreementAttributes(BaseAmazonPayEntity):
     :type store_name: (optional) str
     :param custom_information: Any additional information that you wish to include with this billing agreement. At least one request parameter must be specified.
     :type custom_information: (optional) str
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
 
     """
@@ -47,7 +47,7 @@ class SellerBillingAgreementAttributes(BaseAmazonPayEntity):
         'custom_information': 'str',
         'object_type': 'str',
         'version': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'seller_billing_agreement_id': 'sellerBillingAgreementId',
@@ -55,7 +55,7 @@ class SellerBillingAgreementAttributes(BaseAmazonPayEntity):
         'custom_information': 'customInformation',
         'object_type': '@type',
         'version': '@version'
-    }
+    }  # type: Dict
 
     def __init__(self, seller_billing_agreement_id=None, store_name=None, custom_information=None, version=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str]) -> None
@@ -67,10 +67,10 @@ class SellerBillingAgreementAttributes(BaseAmazonPayEntity):
         :type store_name: (optional) str
         :param custom_information: Any additional information that you wish to include with this billing agreement. At least one request parameter must be specified.
         :type custom_information: (optional) str
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         """
-        self.__discriminator_value = "SellerBillingAgreementAttributes"
+        self.__discriminator_value = "SellerBillingAgreementAttributes"  # type: str
 
         self.object_type = self.__discriminator_value
         super(SellerBillingAgreementAttributes, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -81,7 +81,7 @@ class SellerBillingAgreementAttributes(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

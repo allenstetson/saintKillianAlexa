@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.display.image import Image
     from ask_sdk_model.interfaces.display.text_content import TextContent
@@ -42,13 +42,13 @@ class ListItem(object):
         'token': 'str',
         'image': 'ask_sdk_model.interfaces.display.image.Image',
         'text_content': 'ask_sdk_model.interfaces.display.text_content.TextContent'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'token': 'token',
         'image': 'image',
         'text_content': 'textContent'
-    }
+    }  # type: Dict
 
     def __init__(self, token=None, image=None, text_content=None):
         # type: (Optional[str], Optional[Image], Optional[TextContent]) -> None
@@ -61,7 +61,7 @@ class ListItem(object):
         :param text_content: 
         :type text_content: (optional) ask_sdk_model.interfaces.display.text_content.TextContent
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.token = token
         self.image = image
@@ -70,7 +70,7 @@ class ListItem(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

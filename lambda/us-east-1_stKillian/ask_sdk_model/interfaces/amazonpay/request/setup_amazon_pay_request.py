@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.request.billing_agreement_attributes import BillingAgreementAttributes
 
@@ -32,7 +32,7 @@ class SetupAmazonPayRequest(BaseAmazonPayEntity):
     Setup Amazon Pay Request Object.
 
 
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
     :param seller_id: The seller ID (also known as merchant ID). If you are an Ecommerce Provider (Solution Provider), please specify the ID of the merchant, not your provider ID.
     :type seller_id: (optional) str
@@ -63,7 +63,7 @@ class SetupAmazonPayRequest(BaseAmazonPayEntity):
         'need_amazon_shipping_address': 'bool',
         'sandbox_mode': 'bool',
         'sandbox_customer_email_id': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': '@type',
@@ -76,13 +76,13 @@ class SetupAmazonPayRequest(BaseAmazonPayEntity):
         'need_amazon_shipping_address': 'needAmazonShippingAddress',
         'sandbox_mode': 'sandboxMode',
         'sandbox_customer_email_id': 'sandboxCustomerEmailId'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, seller_id=None, country_of_establishment=None, ledger_currency=None, checkout_language=None, billing_agreement_attributes=None, need_amazon_shipping_address=False, sandbox_mode=False, sandbox_customer_email_id=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[BillingAgreementAttributes], Optional[bool], Optional[bool], Optional[str]) -> None
         """Setup Amazon Pay Request Object.
 
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         :param seller_id: The seller ID (also known as merchant ID). If you are an Ecommerce Provider (Solution Provider), please specify the ID of the merchant, not your provider ID.
         :type seller_id: (optional) str
@@ -101,7 +101,7 @@ class SetupAmazonPayRequest(BaseAmazonPayEntity):
         :param sandbox_customer_email_id: Use this parameter to create a Sandbox payment object. In order to use this parameter, you first create a Sandbox user account in Seller Central. Then, pass the email address associated with that Sandbox user account.
         :type sandbox_customer_email_id: (optional) str
         """
-        self.__discriminator_value = "SetupAmazonPayRequest"
+        self.__discriminator_value = "SetupAmazonPayRequest"  # type: str
 
         self.object_type = self.__discriminator_value
         super(SetupAmazonPayRequest, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -117,7 +117,7 @@ class SetupAmazonPayRequest(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -25,7 +25,7 @@ from ask_sdk_model.services.service_client_response import ServiceClientResponse
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Union
+    from typing import Dict, List, Union, Any
     from datetime import datetime
     from ask_sdk_model.services.directive.error import Error
     from ask_sdk_model.services.directive.send_directive_request import SendDirectiveRequest
@@ -37,7 +37,6 @@ class DirectiveServiceClient(BaseServiceClient):
     :param api_configuration: Instance of :py:class:`ask_sdk_model.services.api_configuration.ApiConfiguration`
     :type api_configuration: ask_sdk_model.services.api_configuration.ApiConfiguration
     """
-
     def __init__(self, api_configuration):
         # type: (ApiConfiguration) -> None
         """
@@ -47,7 +46,7 @@ class DirectiveServiceClient(BaseServiceClient):
         super(DirectiveServiceClient, self).__init__(api_configuration)
 
     def enqueue(self, send_directive_request, **kwargs):
-        # type: (SendDirectiveRequest) -> Union[Error]
+        # type: (SendDirectiveRequest, **Any) -> Union[Error]
         """
         Send directives to Alexa.
 
@@ -65,12 +64,14 @@ class DirectiveServiceClient(BaseServiceClient):
             raise ValueError(
                 "Missing the required parameter `send_directive_request` when calling `" + operation_name + "`")
 
-        resource_path = '/v1/directives'.replace('{format}', 'json')
-        path_params = {}
+        resource_path = '/v1/directives'
+        resource_path = resource_path.replace('{format}', 'json')
 
-        query_params = []
+        path_params = {}  # type: Dict
 
-        header_params = []
+        query_params = []  # type: List
+
+        header_params = []  # type: List
 
         body_params = None
         if 'send_directive_request' in params:
@@ -81,7 +82,7 @@ class DirectiveServiceClient(BaseServiceClient):
         authorization_value = "Bearer " + self._authorization_value
         header_params.append(("Authorization", authorization_value))
 
-        error_definitions = []
+        error_definitions = []  # type: List
         error_definitions.append(ServiceClientResponse(response_type=None, status_code=204, message="Directive sent successfully."))
         error_definitions.append(ServiceClientResponse(response_type="ask_sdk_model.services.directive.error.Error", status_code=400, message="Directive not valid."))
         error_definitions.append(ServiceClientResponse(response_type="ask_sdk_model.services.directive.error.Error", status_code=401, message="Not Authorized."))

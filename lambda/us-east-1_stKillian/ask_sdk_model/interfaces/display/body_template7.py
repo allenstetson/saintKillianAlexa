@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.display.template import Template
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.display.back_button_behavior import BackButtonBehavior
     from ask_sdk_model.interfaces.display.image import Image
@@ -50,7 +50,7 @@ class BodyTemplate7(Template):
         'title': 'str',
         'image': 'ask_sdk_model.interfaces.display.image.Image',
         'background_image': 'ask_sdk_model.interfaces.display.image.Image'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
@@ -59,7 +59,7 @@ class BodyTemplate7(Template):
         'title': 'title',
         'image': 'image',
         'background_image': 'backgroundImage'
-    }
+    }  # type: Dict
 
     def __init__(self, token=None, back_button=None, title=None, image=None, background_image=None):
         # type: (Optional[str], Optional[BackButtonBehavior], Optional[str], Optional[Image], Optional[Image]) -> None
@@ -76,7 +76,7 @@ class BodyTemplate7(Template):
         :param background_image: 
         :type background_image: (optional) ask_sdk_model.interfaces.display.image.Image
         """
-        self.__discriminator_value = "BodyTemplate7"
+        self.__discriminator_value = "BodyTemplate7"  # type: str
 
         self.object_type = self.__discriminator_value
         super(BodyTemplate7, self).__init__(object_type=self.__discriminator_value, token=token, back_button=back_button)
@@ -87,7 +87,7 @@ class BodyTemplate7(Template):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

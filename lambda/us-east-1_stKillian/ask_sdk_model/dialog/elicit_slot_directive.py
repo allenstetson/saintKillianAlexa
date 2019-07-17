@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.intent import Intent
 
@@ -40,13 +40,13 @@ class ElicitSlotDirective(Directive):
         'object_type': 'str',
         'updated_intent': 'ask_sdk_model.intent.Intent',
         'slot_to_elicit': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'updated_intent': 'updatedIntent',
         'slot_to_elicit': 'slotToElicit'
-    }
+    }  # type: Dict
 
     def __init__(self, updated_intent=None, slot_to_elicit=None):
         # type: (Optional[Intent], Optional[str]) -> None
@@ -57,7 +57,7 @@ class ElicitSlotDirective(Directive):
         :param slot_to_elicit: 
         :type slot_to_elicit: (optional) str
         """
-        self.__discriminator_value = "Dialog.ElicitSlot"
+        self.__discriminator_value = "Dialog.ElicitSlot"  # type: str
 
         self.object_type = self.__discriminator_value
         super(ElicitSlotDirective, self).__init__(object_type=self.__discriminator_value)
@@ -67,7 +67,7 @@ class ElicitSlotDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

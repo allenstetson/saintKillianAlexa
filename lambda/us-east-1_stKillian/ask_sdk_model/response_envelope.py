@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.response import Response
 
@@ -44,14 +44,14 @@ class ResponseEnvelope(object):
         'session_attributes': 'dict(str, object)',
         'user_agent': 'str',
         'response': 'ask_sdk_model.response.Response'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'version': 'version',
         'session_attributes': 'sessionAttributes',
         'user_agent': 'userAgent',
         'response': 'response'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, session_attributes=None, user_agent=None, response=None):
         # type: (Optional[str], Optional[Dict[str, object]], Optional[str], Optional[Response]) -> None
@@ -66,7 +66,7 @@ class ResponseEnvelope(object):
         :param response: 
         :type response: (optional) ask_sdk_model.response.Response
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.version = version
         self.session_attributes = session_attributes
@@ -76,7 +76,7 @@ class ResponseEnvelope(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

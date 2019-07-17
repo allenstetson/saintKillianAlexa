@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.input_event_action_type import InputEventActionType
 
@@ -47,7 +47,7 @@ class InputEvent(object):
         'action': 'ask_sdk_model.services.game_engine.input_event_action_type.InputEventActionType',
         'color': 'str',
         'feature': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'gadget_id': 'gadgetId',
@@ -55,7 +55,7 @@ class InputEvent(object):
         'action': 'action',
         'color': 'color',
         'feature': 'feature'
-    }
+    }  # type: Dict
 
     def __init__(self, gadget_id=None, timestamp=None, action=None, color=None, feature=None):
         # type: (Optional[str], Optional[str], Optional[InputEventActionType], Optional[str], Optional[str]) -> None
@@ -72,7 +72,7 @@ class InputEvent(object):
         :param feature: For gadgets with multiple features, this is the feature that the event represents. Echo Buttons have one feature only, so this is always &#x60;press&#x60;.
         :type feature: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.gadget_id = gadget_id
         self.timestamp = timestamp
@@ -83,7 +83,7 @@ class InputEvent(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

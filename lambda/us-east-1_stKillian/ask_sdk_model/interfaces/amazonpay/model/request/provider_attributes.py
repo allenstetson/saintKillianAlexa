@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.request.provider_credit import ProviderCredit
 
@@ -36,7 +36,7 @@ class ProviderAttributes(BaseAmazonPayEntity):
     :type provider_id: (optional) str
     :param provider_credit_list: List of provider credit.
     :type provider_credit_list: (optional) list[ask_sdk_model.interfaces.amazonpay.model.request.provider_credit.ProviderCredit]
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
 
     """
@@ -45,14 +45,14 @@ class ProviderAttributes(BaseAmazonPayEntity):
         'provider_credit_list': 'list[ask_sdk_model.interfaces.amazonpay.model.request.provider_credit.ProviderCredit]',
         'object_type': 'str',
         'version': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'provider_id': 'providerId',
         'provider_credit_list': 'providerCreditList',
         'object_type': '@type',
         'version': '@version'
-    }
+    }  # type: Dict
 
     def __init__(self, provider_id=None, provider_credit_list=None, version=None):
         # type: (Optional[str], Optional[List[ProviderCredit]], Optional[str]) -> None
@@ -62,10 +62,10 @@ class ProviderAttributes(BaseAmazonPayEntity):
         :type provider_id: (optional) str
         :param provider_credit_list: List of provider credit.
         :type provider_credit_list: (optional) list[ask_sdk_model.interfaces.amazonpay.model.request.provider_credit.ProviderCredit]
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         """
-        self.__discriminator_value = "ProviderAttributes"
+        self.__discriminator_value = "ProviderAttributes"  # type: str
 
         self.object_type = self.__discriminator_value
         super(ProviderAttributes, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -75,7 +75,7 @@ class ProviderAttributes(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

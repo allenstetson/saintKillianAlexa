@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.alexa.presentation.apl.command import Command
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -53,7 +53,7 @@ class AutoPageCommand(Command):
         'component_id': 'str',
         'count': 'int',
         'duration': 'int'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
@@ -63,10 +63,10 @@ class AutoPageCommand(Command):
         'component_id': 'componentId',
         'count': 'count',
         'duration': 'duration'
-    }
+    }  # type: Dict
 
     def __init__(self, delay=None, description=None, when=None, component_id=None, count=None, duration=None):
-        # type: (Optional[int], Optional[str], Optional[bool], Optional[str], Optional[int], Optional[int]) -> None
+        # type: (Union[int, str, None], Optional[str], Optional[bool], Optional[str], Union[int, str, None], Union[int, str, None]) -> None
         """Automatically progress through a series of pages displayed in a Pager component. The AutoPage command finishes after the last page has been displayed for the requested time period.
 
         :param delay: The delay in milliseconds before this command starts executing; must be non-negative. Defaults to 0.
@@ -82,7 +82,7 @@ class AutoPageCommand(Command):
         :param duration: Time to wait between pages (in milliseconds). Defaults to 0.
         :type duration: (optional) int
         """
-        self.__discriminator_value = "AutoPage"
+        self.__discriminator_value = "AutoPage"  # type: str
 
         self.object_type = self.__discriminator_value
         super(AutoPageCommand, self).__init__(object_type=self.__discriminator_value, delay=delay, description=description, when=when)
@@ -93,7 +93,7 @@ class AutoPageCommand(Command):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

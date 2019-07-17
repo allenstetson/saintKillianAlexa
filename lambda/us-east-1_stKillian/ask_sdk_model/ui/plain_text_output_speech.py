@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,44 +22,51 @@ from ask_sdk_model.ui.output_speech import OutputSpeech
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
+    from ask_sdk_model.ui.play_behavior import PlayBehavior
 
 
 class PlainTextOutputSpeech(OutputSpeech):
     """
 
+    :param play_behavior: 
+    :type play_behavior: (optional) ask_sdk_model.ui.play_behavior.PlayBehavior
     :param text: 
     :type text: (optional) str
 
     """
     deserialized_types = {
         'object_type': 'str',
+        'play_behavior': 'ask_sdk_model.ui.play_behavior.PlayBehavior',
         'text': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
+        'play_behavior': 'playBehavior',
         'text': 'text'
-    }
+    }  # type: Dict
 
-    def __init__(self, text=None):
-        # type: (Optional[str]) -> None
+    def __init__(self, play_behavior=None, text=None):
+        # type: (Optional[PlayBehavior], Optional[str]) -> None
         """
 
+        :param play_behavior: 
+        :type play_behavior: (optional) ask_sdk_model.ui.play_behavior.PlayBehavior
         :param text: 
         :type text: (optional) str
         """
-        self.__discriminator_value = "PlainText"
+        self.__discriminator_value = "PlainText"  # type: str
 
         self.object_type = self.__discriminator_value
-        super(PlainTextOutputSpeech, self).__init__(object_type=self.__discriminator_value)
+        super(PlainTextOutputSpeech, self).__init__(object_type=self.__discriminator_value, play_behavior=play_behavior)
         self.text = text
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

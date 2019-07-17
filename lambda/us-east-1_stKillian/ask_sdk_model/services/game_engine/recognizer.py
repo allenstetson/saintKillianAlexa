@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from abc import ABCMeta, abstractmethod
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -48,11 +48,11 @@ class Recognizer(object):
     """
     deserialized_types = {
         'object_type': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type'
-    }
+    }  # type: Dict
 
     discriminator_value_class_map = {
         'progress': 'ask_sdk_model.services.game_engine.progress_recognizer.ProgressRecognizer',
@@ -72,13 +72,13 @@ class Recognizer(object):
         :param object_type: 
         :type object_type: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.object_type = object_type
 
     @classmethod
     def get_real_child_model(cls, data):
-        # type: (Dict[str, str]) -> str
+        # type: (Dict[str, str]) -> Optional[str]
         """Returns the real base class specified by the discriminator"""
         discriminator_value = data[cls.json_discriminator_key]
         return cls.discriminator_value_class_map.get(discriminator_value)
@@ -86,7 +86,7 @@ class Recognizer(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

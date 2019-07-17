@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.request import Request
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.input_handler_event import InputHandlerEvent
 
@@ -36,52 +36,58 @@ class InputHandlerEventRequest(Request):
     :type request_id: (optional) str
     :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
     :type timestamp: (optional) datetime
+    :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+    :type locale: (optional) str
+    :param originating_request_id: The corresponding identifier of the request that started the input handler.
+    :type originating_request_id: (optional) str
     :param events: 
     :type events: (optional) list[ask_sdk_model.services.game_engine.input_handler_event.InputHandlerEvent]
-    :param locale: A string indicating the user’s locale. For example: en-US.
-    :type locale: (optional) str
 
     """
     deserialized_types = {
         'object_type': 'str',
         'request_id': 'str',
         'timestamp': 'datetime',
-        'events': 'list[ask_sdk_model.services.game_engine.input_handler_event.InputHandlerEvent]',
-        'locale': 'str'
-    }
+        'locale': 'str',
+        'originating_request_id': 'str',
+        'events': 'list[ask_sdk_model.services.game_engine.input_handler_event.InputHandlerEvent]'
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'request_id': 'requestId',
         'timestamp': 'timestamp',
-        'events': 'events',
-        'locale': 'locale'
-    }
+        'locale': 'locale',
+        'originating_request_id': 'originatingRequestId',
+        'events': 'events'
+    }  # type: Dict
 
-    def __init__(self, request_id=None, timestamp=None, events=None, locale=None):
-        # type: (Optional[str], Optional[datetime], Optional[List[InputHandlerEvent]], Optional[str]) -> None
+    def __init__(self, request_id=None, timestamp=None, locale=None, originating_request_id=None, events=None):
+        # type: (Optional[str], Optional[datetime], Optional[str], Optional[str], Optional[List[InputHandlerEvent]]) -> None
         """Sent when the conditions of an Echo Button event that your skill defined were met.
 
         :param request_id: Represents the unique identifier for the specific request.
         :type request_id: (optional) str
         :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
         :type timestamp: (optional) datetime
+        :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+        :type locale: (optional) str
+        :param originating_request_id: The corresponding identifier of the request that started the input handler.
+        :type originating_request_id: (optional) str
         :param events: 
         :type events: (optional) list[ask_sdk_model.services.game_engine.input_handler_event.InputHandlerEvent]
-        :param locale: A string indicating the user’s locale. For example: en-US.
-        :type locale: (optional) str
         """
-        self.__discriminator_value = "GameEngine.InputHandlerEvent"
+        self.__discriminator_value = "GameEngine.InputHandlerEvent"  # type: str
 
         self.object_type = self.__discriminator_value
-        super(InputHandlerEventRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp)
+        super(InputHandlerEventRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp, locale=locale)
+        self.originating_request_id = originating_request_id
         self.events = events
-        self.locale = locale
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

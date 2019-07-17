@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -57,7 +57,7 @@ class Address(object):
         'city': 'str',
         'district_or_county': 'str',
         'postal_code': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'address_line1': 'addressLine1',
@@ -68,7 +68,7 @@ class Address(object):
         'city': 'city',
         'district_or_county': 'districtOrCounty',
         'postal_code': 'postalCode'
-    }
+    }  # type: Dict
 
     def __init__(self, address_line1=None, address_line2=None, address_line3=None, country_code=None, state_or_region=None, city=None, district_or_county=None, postal_code=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]) -> None
@@ -91,7 +91,7 @@ class Address(object):
         :param postal_code: 
         :type postal_code: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.address_line1 = address_line1
         self.address_line2 = address_line2
@@ -105,7 +105,7 @@ class Address(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

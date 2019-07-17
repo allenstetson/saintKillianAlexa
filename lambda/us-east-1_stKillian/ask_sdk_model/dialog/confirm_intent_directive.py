@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.intent import Intent
 
@@ -37,12 +37,12 @@ class ConfirmIntentDirective(Directive):
     deserialized_types = {
         'object_type': 'str',
         'updated_intent': 'ask_sdk_model.intent.Intent'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'updated_intent': 'updatedIntent'
-    }
+    }  # type: Dict
 
     def __init__(self, updated_intent=None):
         # type: (Optional[Intent]) -> None
@@ -51,7 +51,7 @@ class ConfirmIntentDirective(Directive):
         :param updated_intent: 
         :type updated_intent: (optional) ask_sdk_model.intent.Intent
         """
-        self.__discriminator_value = "Dialog.ConfirmIntent"
+        self.__discriminator_value = "Dialog.ConfirmIntent"  # type: str
 
         self.object_type = self.__discriminator_value
         super(ConfirmIntentDirective, self).__init__(object_type=self.__discriminator_value)
@@ -60,7 +60,7 @@ class ConfirmIntentDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

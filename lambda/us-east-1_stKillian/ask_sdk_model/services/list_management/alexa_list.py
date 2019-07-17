@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.list_management.alexa_list_item import AlexaListItem
     from ask_sdk_model.services.list_management.list_state import ListState
@@ -52,7 +52,7 @@ class AlexaList(object):
         'version': 'int',
         'items': 'list[ask_sdk_model.services.list_management.alexa_list_item.AlexaListItem]',
         'links': 'ask_sdk_model.services.list_management.links.Links'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'list_id': 'listId',
@@ -61,7 +61,7 @@ class AlexaList(object):
         'version': 'version',
         'items': 'items',
         'links': 'links'
-    }
+    }  # type: Dict
 
     def __init__(self, list_id=None, name=None, state=None, version=None, items=None, links=None):
         # type: (Optional[str], Optional[str], Optional[ListState], Optional[int], Optional[List[AlexaListItem]], Optional[Links]) -> None
@@ -80,7 +80,7 @@ class AlexaList(object):
         :param links: 
         :type links: (optional) ask_sdk_model.services.list_management.links.Links
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.list_id = list_id
         self.name = name
@@ -92,7 +92,7 @@ class AlexaList(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

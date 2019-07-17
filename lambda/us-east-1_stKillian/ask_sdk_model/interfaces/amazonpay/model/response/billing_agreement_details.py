@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.v1.billing_agreement_details impor
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.v1.billing_agreement_status import BillingAgreementStatus
     from ask_sdk_model.interfaces.amazonpay.model.v1.destination import Destination
@@ -39,7 +39,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
     :type billing_agreement_id: (optional) str
     :param creation_timestamp: Time at which billing agreement details created.
     :type creation_timestamp: (optional) datetime
-    :param destination: 
+    :param destination: The default shipping address of the buyer. Returned if needAmazonShippingAddress is set to true.
     :type destination: (optional) ask_sdk_model.interfaces.amazonpay.model.v1.destination.Destination
     :param checkout_language: Merchant&#39;s preferred language of checkout.
     :type checkout_language: (optional) str
@@ -47,7 +47,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
     :type release_environment: (optional) ask_sdk_model.interfaces.amazonpay.model.response.release_environment.ReleaseEnvironment
     :param billing_agreement_status: 
     :type billing_agreement_status: (optional) ask_sdk_model.interfaces.amazonpay.model.v1.billing_agreement_status.BillingAgreementStatus
-    :param billing_address: 
+    :param billing_address: The Billing Address of the payment instrument associated with Billing Agreement.
     :type billing_address: (optional) ask_sdk_model.interfaces.amazonpay.model.response.destination.Destination
 
     """
@@ -59,7 +59,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
         'release_environment': 'ask_sdk_model.interfaces.amazonpay.model.response.release_environment.ReleaseEnvironment',
         'billing_agreement_status': 'ask_sdk_model.interfaces.amazonpay.model.v1.billing_agreement_status.BillingAgreementStatus',
         'billing_address': 'ask_sdk_model.interfaces.amazonpay.model.response.destination.Destination'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'billing_agreement_id': 'billingAgreementId',
@@ -69,7 +69,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
         'release_environment': 'releaseEnvironment',
         'billing_agreement_status': 'billingAgreementStatus',
         'billing_address': 'billingAddress'
-    }
+    }  # type: Dict
 
     def __init__(self, billing_agreement_id=None, creation_timestamp=None, destination=None, checkout_language=None, release_environment=None, billing_agreement_status=None, billing_address=None):
         # type: (Optional[str], Optional[datetime], Optional[Destination], Optional[str], Optional[ReleaseEnvironment], Optional[BillingAgreementStatus], Optional[Destination]) -> None
@@ -79,7 +79,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
         :type billing_agreement_id: (optional) str
         :param creation_timestamp: Time at which billing agreement details created.
         :type creation_timestamp: (optional) datetime
-        :param destination: 
+        :param destination: The default shipping address of the buyer. Returned if needAmazonShippingAddress is set to true.
         :type destination: (optional) ask_sdk_model.interfaces.amazonpay.model.v1.destination.Destination
         :param checkout_language: Merchant&#39;s preferred language of checkout.
         :type checkout_language: (optional) str
@@ -87,10 +87,10 @@ class BillingAgreementDetails(BillingAgreementDetails):
         :type release_environment: (optional) ask_sdk_model.interfaces.amazonpay.model.response.release_environment.ReleaseEnvironment
         :param billing_agreement_status: 
         :type billing_agreement_status: (optional) ask_sdk_model.interfaces.amazonpay.model.v1.billing_agreement_status.BillingAgreementStatus
-        :param billing_address: 
+        :param billing_address: The Billing Address of the payment instrument associated with Billing Agreement.
         :type billing_address: (optional) ask_sdk_model.interfaces.amazonpay.model.response.destination.Destination
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         super(BillingAgreementDetails, self).__init__(billing_agreement_id=billing_agreement_id, creation_timestamp=creation_timestamp, destination=destination, checkout_language=checkout_language, release_environment=release_environment, billing_agreement_status=billing_agreement_status)
         self.release_environment = release_environment
@@ -99,7 +99,7 @@ class BillingAgreementDetails(BillingAgreementDetails):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

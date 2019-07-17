@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.connections.entities.base_entity import BaseEntity
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -53,7 +53,7 @@ class PostalAddress(BaseEntity):
         'region': 'str',
         'postal_code': 'str',
         'country': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': '@type',
@@ -63,7 +63,7 @@ class PostalAddress(BaseEntity):
         'region': 'region',
         'postal_code': 'postalCode',
         'country': 'country'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, street_address=None, locality=None, region=None, postal_code=None, country=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]) -> None
@@ -82,7 +82,7 @@ class PostalAddress(BaseEntity):
         :param country: country
         :type country: (optional) str
         """
-        self.__discriminator_value = "PostalAddress"
+        self.__discriminator_value = "PostalAddress"  # type: str
 
         self.object_type = self.__discriminator_value
         super(PostalAddress, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -95,7 +95,7 @@ class PostalAddress(BaseEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

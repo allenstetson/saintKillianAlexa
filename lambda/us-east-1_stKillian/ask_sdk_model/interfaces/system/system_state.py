@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.device import Device
     from ask_sdk_model.application import Application
@@ -49,7 +49,7 @@ class SystemState(object):
         'device': 'ask_sdk_model.device.Device',
         'api_endpoint': 'str',
         'api_access_token': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'application': 'application',
@@ -57,7 +57,7 @@ class SystemState(object):
         'device': 'device',
         'api_endpoint': 'apiEndpoint',
         'api_access_token': 'apiAccessToken'
-    }
+    }  # type: Dict
 
     def __init__(self, application=None, user=None, device=None, api_endpoint=None, api_access_token=None):
         # type: (Optional[Application], Optional[User], Optional[Device], Optional[str], Optional[str]) -> None
@@ -74,7 +74,7 @@ class SystemState(object):
         :param api_access_token: 
         :type api_access_token: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.application = application
         self.user = user
@@ -85,7 +85,7 @@ class SystemState(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

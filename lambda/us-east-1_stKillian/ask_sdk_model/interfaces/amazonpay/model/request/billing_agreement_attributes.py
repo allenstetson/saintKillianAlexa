@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.amazonpay.model.request.base_amazon_pay_entity imp
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.amazonpay.model.request.seller_billing_agreement_attributes import SellerBillingAgreementAttributes
 
@@ -38,7 +38,7 @@ class BillingAgreementAttributes(BaseAmazonPayEntity):
     :type seller_note: (optional) str
     :param seller_billing_agreement_attributes: 
     :type seller_billing_agreement_attributes: (optional) ask_sdk_model.interfaces.amazonpay.model.request.seller_billing_agreement_attributes.SellerBillingAgreementAttributes
-    :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+    :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
     :type version: (optional) str
 
     """
@@ -48,7 +48,7 @@ class BillingAgreementAttributes(BaseAmazonPayEntity):
         'seller_billing_agreement_attributes': 'ask_sdk_model.interfaces.amazonpay.model.request.seller_billing_agreement_attributes.SellerBillingAgreementAttributes',
         'object_type': 'str',
         'version': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'platform_id': 'platformId',
@@ -56,7 +56,7 @@ class BillingAgreementAttributes(BaseAmazonPayEntity):
         'seller_billing_agreement_attributes': 'sellerBillingAgreementAttributes',
         'object_type': '@type',
         'version': '@version'
-    }
+    }  # type: Dict
 
     def __init__(self, platform_id=None, seller_note=None, seller_billing_agreement_attributes=None, version=None):
         # type: (Optional[str], Optional[str], Optional[SellerBillingAgreementAttributes], Optional[str]) -> None
@@ -68,10 +68,10 @@ class BillingAgreementAttributes(BaseAmazonPayEntity):
         :type seller_note: (optional) str
         :param seller_billing_agreement_attributes: 
         :type seller_billing_agreement_attributes: (optional) ask_sdk_model.interfaces.amazonpay.model.request.seller_billing_agreement_attributes.SellerBillingAgreementAttributes
-        :param version: Version of the Amazon Pay Entity. Can be 2 or greater.
+        :param version: Version of the Amazon Pay Entity. Can be 1 or greater.
         :type version: (optional) str
         """
-        self.__discriminator_value = "BillingAgreementAttributes"
+        self.__discriminator_value = "BillingAgreementAttributes"  # type: str
 
         self.object_type = self.__discriminator_value
         super(BillingAgreementAttributes, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -82,7 +82,7 @@ class BillingAgreementAttributes(BaseAmazonPayEntity):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

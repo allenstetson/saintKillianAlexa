@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.request import Request
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.dialog_state import DialogState
     from ask_sdk_model.intent import Intent
@@ -37,59 +37,58 @@ class CanFulfillIntentRequest(Request):
     :type request_id: (optional) str
     :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
     :type timestamp: (optional) datetime
+    :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+    :type locale: (optional) str
     :param dialog_state: 
     :type dialog_state: (optional) ask_sdk_model.dialog_state.DialogState
     :param intent: 
     :type intent: (optional) ask_sdk_model.intent.Intent
-    :param locale: A string indicating the user’s locale. For example: en-US.
-    :type locale: (optional) str
 
     """
     deserialized_types = {
         'object_type': 'str',
         'request_id': 'str',
         'timestamp': 'datetime',
+        'locale': 'str',
         'dialog_state': 'ask_sdk_model.dialog_state.DialogState',
-        'intent': 'ask_sdk_model.intent.Intent',
-        'locale': 'str'
-    }
+        'intent': 'ask_sdk_model.intent.Intent'
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'request_id': 'requestId',
         'timestamp': 'timestamp',
+        'locale': 'locale',
         'dialog_state': 'dialogState',
-        'intent': 'intent',
-        'locale': 'locale'
-    }
+        'intent': 'intent'
+    }  # type: Dict
 
-    def __init__(self, request_id=None, timestamp=None, dialog_state=None, intent=None, locale=None):
-        # type: (Optional[str], Optional[datetime], Optional[DialogState], Optional[Intent], Optional[str]) -> None
+    def __init__(self, request_id=None, timestamp=None, locale=None, dialog_state=None, intent=None):
+        # type: (Optional[str], Optional[datetime], Optional[str], Optional[DialogState], Optional[Intent]) -> None
         """An object that represents a request made to skill to query whether the skill can understand and fulfill the intent request with detected slots, before actually asking the skill to take action. Skill should be aware this is not to actually take action, skill should handle this request without causing side-effect, skill should not modify some state outside its scope or has an observable interaction with its calling functions or the outside world besides returning a value, such as playing sound,turning on/off lights, committing a transaction or a charge.
 
         :param request_id: Represents the unique identifier for the specific request.
         :type request_id: (optional) str
         :param timestamp: Provides the date and time when Alexa sent the request as an ISO 8601 formatted string. Used to verify the request when hosting your skill as a web service.
         :type timestamp: (optional) datetime
+        :param locale: A string indicating the user’s locale. For example: en-US. This value is only provided with certain request types.
+        :type locale: (optional) str
         :param dialog_state: 
         :type dialog_state: (optional) ask_sdk_model.dialog_state.DialogState
         :param intent: 
         :type intent: (optional) ask_sdk_model.intent.Intent
-        :param locale: A string indicating the user’s locale. For example: en-US.
-        :type locale: (optional) str
         """
-        self.__discriminator_value = "CanFulfillIntentRequest"
+        self.__discriminator_value = "CanFulfillIntentRequest"  # type: str
 
         self.object_type = self.__discriminator_value
-        super(CanFulfillIntentRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp)
+        super(CanFulfillIntentRequest, self).__init__(object_type=self.__discriminator_value, request_id=request_id, timestamp=timestamp, locale=locale)
         self.dialog_state = dialog_state
         self.intent = intent
-        self.locale = locale
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

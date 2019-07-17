@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -39,12 +39,12 @@ class AmazonPayErrorResponse(object):
     deserialized_types = {
         'error_code': 'str',
         'error_message': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'error_code': 'errorCode',
         'error_message': 'errorMessage'
-    }
+    }  # type: Dict
 
     def __init__(self, error_code=None, error_message=None):
         # type: (Optional[str], Optional[str]) -> None
@@ -55,7 +55,7 @@ class AmazonPayErrorResponse(object):
         :param error_message: Description of the error.
         :type error_message: (optional) str
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.error_code = error_code
         self.error_message = error_message
@@ -63,7 +63,7 @@ class AmazonPayErrorResponse(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

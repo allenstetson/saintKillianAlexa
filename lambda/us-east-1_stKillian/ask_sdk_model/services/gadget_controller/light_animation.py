@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.gadget_controller.animation_step import AnimationStep
 
@@ -41,13 +41,13 @@ class LightAnimation(object):
         'repeat': 'int',
         'target_lights': 'list[str]',
         'sequence': 'list[ask_sdk_model.services.gadget_controller.animation_step.AnimationStep]'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'repeat': 'repeat',
         'target_lights': 'targetLights',
         'sequence': 'sequence'
-    }
+    }  # type: Dict
 
     def __init__(self, repeat=None, target_lights=None, sequence=None):
         # type: (Optional[int], Optional[List[object]], Optional[List[AnimationStep]]) -> None
@@ -60,7 +60,7 @@ class LightAnimation(object):
         :param sequence: The animation steps to render in order. The maximum number of steps that you can define is 38. The minimum is 0. Each step must have the following fields, all of which are required.
         :type sequence: (optional) list[ask_sdk_model.services.gadget_controller.animation_step.AnimationStep]
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.repeat = repeat
         self.target_lights = target_lights
@@ -69,7 +69,7 @@ class LightAnimation(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

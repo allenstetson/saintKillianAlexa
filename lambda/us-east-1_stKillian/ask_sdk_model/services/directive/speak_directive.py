@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.services.directive.directive import Directive
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
 
 
@@ -36,12 +36,12 @@ class SpeakDirective(Directive):
     deserialized_types = {
         'object_type': 'str',
         'speech': 'str'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
         'speech': 'speech'
-    }
+    }  # type: Dict
 
     def __init__(self, speech=None):
         # type: (Optional[str]) -> None
@@ -50,7 +50,7 @@ class SpeakDirective(Directive):
         :param speech: 
         :type speech: (optional) str
         """
-        self.__discriminator_value = "VoicePlayer.Speak"
+        self.__discriminator_value = "VoicePlayer.Speak"  # type: str
 
         self.object_type = self.__discriminator_value
         super(SpeakDirective, self).__init__(object_type=self.__discriminator_value)
@@ -59,7 +59,7 @@ class SpeakDirective(Directive):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

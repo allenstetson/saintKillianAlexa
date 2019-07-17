@@ -115,7 +115,7 @@ class GenericRequestDispatcher(AbstractRequestDispatcher):
             for request_interceptor in self.request_interceptors:
                 request_interceptor.process(handler_input=handler_input)
 
-            output = self.__dispatch_request(handler_input)
+            output = self.__dispatch_request(handler_input)  # type: Union[Output, None]
 
             for response_interceptor in self.response_interceptors:
                 response_interceptor.process(
@@ -180,12 +180,12 @@ class GenericRequestDispatcher(AbstractRequestDispatcher):
             interceptor.process(handler_input=handler_input)
 
         output = supported_handler_adapter.execute(
-            handler_input=handler_input, handler=request_handler)
+            handler_input=handler_input, handler=request_handler)  # type: Union[Output, None]
 
         local_response_interceptors = (
             request_handler_chain.response_interceptors)
-        for interceptor in local_response_interceptors:
-            interceptor.process(
+        for response_interceptor in local_response_interceptors:
+            response_interceptor.process(
                 handler_input=handler_input, response=output)
 
         return output

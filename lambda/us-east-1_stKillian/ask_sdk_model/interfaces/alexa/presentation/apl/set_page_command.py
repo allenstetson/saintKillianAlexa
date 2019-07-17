@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.alexa.presentation.apl.command import Command
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.alexa.presentation.apl.position import Position
 
@@ -54,7 +54,7 @@ class SetPageCommand(Command):
         'component_id': 'str',
         'position': 'ask_sdk_model.interfaces.alexa.presentation.apl.position.Position',
         'value': 'int'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': 'type',
@@ -64,10 +64,10 @@ class SetPageCommand(Command):
         'component_id': 'componentId',
         'position': 'position',
         'value': 'value'
-    }
+    }  # type: Dict
 
     def __init__(self, delay=None, description=None, when=None, component_id=None, position=None, value=None):
-        # type: (Optional[int], Optional[str], Optional[bool], Optional[str], Optional[Position], Optional[int]) -> None
+        # type: (Union[int, str, None], Optional[str], Optional[bool], Optional[str], Optional[Position], Union[int, str, None]) -> None
         """Change the page displayed in a Pager component. The SetPage command finishes when the item is fully in view.
 
         :param delay: The delay in milliseconds before this command starts executing; must be non-negative. Defaults to 0.
@@ -83,7 +83,7 @@ class SetPageCommand(Command):
         :param value: The distance to move. May be an absolute value or a relative value.
         :type value: (optional) int
         """
-        self.__discriminator_value = "SetPage"
+        self.__discriminator_value = "SetPage"  # type: str
 
         self.object_type = self.__discriminator_value
         super(SetPageCommand, self).__init__(object_type=self.__discriminator_value, delay=delay, description=description, when=when)
@@ -94,7 +94,7 @@ class SetPageCommand(Command):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

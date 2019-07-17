@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,6 +22,9 @@ from .device_address import DeviceAddressServiceClient
 from .directive import DirectiveServiceClient
 from .list_management import ListManagementServiceClient
 from .monetization import MonetizationServiceClient
+from .proactive_events import ProactiveEventsServiceClient
+from .reminder_management import ReminderManagementServiceClient
+from .skill_messaging import SkillMessagingServiceClient
 from .ups import UpsServiceClient
 
 if typing.TYPE_CHECKING:
@@ -50,7 +53,7 @@ class ServiceClientFactory(object):
             return DeviceAddressServiceClient(self.api_configuration)
         except Exception as e:
             raise ValueError(
-                "ServiceClientFactory Error while initializing DeviceAddressServiceClient: " + e)
+                "ServiceClientFactory Error while initializing DeviceAddressServiceClient: " + str(e))
 
     def get_directive_service(self):
         # type: () -> DirectiveServiceClient
@@ -64,7 +67,7 @@ class ServiceClientFactory(object):
             return DirectiveServiceClient(self.api_configuration)
         except Exception as e:
             raise ValueError(
-                "ServiceClientFactory Error while initializing DirectiveServiceClient: " + e)
+                "ServiceClientFactory Error while initializing DirectiveServiceClient: " + str(e))
 
     def get_list_management_service(self):
         # type: () -> ListManagementServiceClient
@@ -78,7 +81,7 @@ class ServiceClientFactory(object):
             return ListManagementServiceClient(self.api_configuration)
         except Exception as e:
             raise ValueError(
-                "ServiceClientFactory Error while initializing ListManagementServiceClient: " + e)
+                "ServiceClientFactory Error while initializing ListManagementServiceClient: " + str(e))
 
     def get_monetization_service(self):
         # type: () -> MonetizationServiceClient
@@ -92,7 +95,21 @@ class ServiceClientFactory(object):
             return MonetizationServiceClient(self.api_configuration)
         except Exception as e:
             raise ValueError(
-                "ServiceClientFactory Error while initializing MonetizationServiceClient: " + e)
+                "ServiceClientFactory Error while initializing MonetizationServiceClient: " + str(e))
+
+    def get_reminder_management_service(self):
+        # type: () -> ReminderManagementServiceClient
+        """Get ReminderManagementServiceClient for reminder_management_service.
+
+        :return: Client for calling the service
+        :rtype: ReminderManagementServiceClient
+        :raises: :py:class:`ValueError`
+        """
+        try:
+            return ReminderManagementServiceClient(self.api_configuration)
+        except Exception as e:
+            raise ValueError(
+                "ServiceClientFactory Error while initializing ReminderManagementServiceClient: " + str(e))
 
     def get_ups_service(self):
         # type: () -> UpsServiceClient
@@ -106,5 +123,5 @@ class ServiceClientFactory(object):
             return UpsServiceClient(self.api_configuration)
         except Exception as e:
             raise ValueError(
-                "ServiceClientFactory Error while initializing UpsServiceClient: " + e)
+                "ServiceClientFactory Error while initializing UpsServiceClient: " + str(e))
 

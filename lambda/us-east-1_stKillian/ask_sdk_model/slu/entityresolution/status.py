@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.slu.entityresolution.status_code import StatusCode
 
@@ -35,11 +35,11 @@ class Status(object):
     """
     deserialized_types = {
         'code': 'ask_sdk_model.slu.entityresolution.status_code.StatusCode'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'code': 'code'
-    }
+    }  # type: Dict
 
     def __init__(self, code=None):
         # type: (Optional[StatusCode]) -> None
@@ -48,14 +48,14 @@ class Status(object):
         :param code: Indication of the results of attempting to resolve the user utterance against the defined slot types.
         :type code: (optional) ask_sdk_model.slu.entityresolution.status_code.StatusCode
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.code = code
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

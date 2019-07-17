@@ -20,10 +20,10 @@ __description__ = (
     'The ASK SDK Standard package provides a full distribution of the SDK, '
     'all batteries included, for building Alexa Skills.')
 __url__ = 'https://github.com/alexa/alexa-skills-kit-sdk-for-python'
-__version__ = '1.3.0'
+__version__ = '1.10.2'
 __author__ = 'Alexa Skills Kit'
 __author_email__ = 'ask-sdk-dynamic@amazon.com'
 __license__ = 'Apache 2.0'
 __keywords__ = ['ASK SDK', 'Alexa Skills Kit', 'Alexa', 'ASK SDK Core',
                 'Persistence', 'DynamoDB', 'ASK SDK Standard']
-__install_requires__ = ["ask-sdk-core", 'ask-sdk-dynamodb-persistence-adapter']
+__install_requires__ = ["ask-sdk-core>=1.1.0", "ask-sdk-dynamodb-persistence-adapter>=1.1.0"]

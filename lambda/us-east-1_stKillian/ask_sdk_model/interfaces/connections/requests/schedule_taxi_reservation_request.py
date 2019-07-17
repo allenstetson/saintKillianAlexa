@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -22,7 +22,7 @@ from ask_sdk_model.interfaces.connections.requests.base_request import BaseReque
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.interfaces.connections.entities.postal_address import PostalAddress
 
@@ -51,7 +51,7 @@ class ScheduleTaxiReservationRequest(BaseRequest):
         'party_size': 'str',
         'pickup_location': 'ask_sdk_model.interfaces.connections.entities.postal_address.PostalAddress',
         'drop_off_location': 'ask_sdk_model.interfaces.connections.entities.postal_address.PostalAddress'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'object_type': '@type',
@@ -60,7 +60,7 @@ class ScheduleTaxiReservationRequest(BaseRequest):
         'party_size': 'partySize',
         'pickup_location': 'pickupLocation',
         'drop_off_location': 'dropOffLocation'
-    }
+    }  # type: Dict
 
     def __init__(self, version=None, pickup_time=None, party_size=None, pickup_location=None, drop_off_location=None):
         # type: (Optional[str], Optional[str], Optional[str], Optional[PostalAddress], Optional[PostalAddress]) -> None
@@ -77,7 +77,7 @@ class ScheduleTaxiReservationRequest(BaseRequest):
         :param drop_off_location: drop off location
         :type drop_off_location: (optional) ask_sdk_model.interfaces.connections.entities.postal_address.PostalAddress
         """
-        self.__discriminator_value = "ScheduleTaxiReservationRequest"
+        self.__discriminator_value = "ScheduleTaxiReservationRequest"  # type: str
 
         self.object_type = self.__discriminator_value
         super(ScheduleTaxiReservationRequest, self).__init__(object_type=self.__discriminator_value, version=version)
@@ -89,7 +89,7 @@ class ScheduleTaxiReservationRequest(BaseRequest):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

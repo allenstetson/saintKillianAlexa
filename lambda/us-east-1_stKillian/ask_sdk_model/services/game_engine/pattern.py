@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.services.game_engine.input_event_action_type import InputEventActionType
 
@@ -37,22 +37,26 @@ class Pattern(object):
     :type colors: (optional) list[str]
     :param action: 
     :type action: (optional) ask_sdk_model.services.game_engine.input_event_action_type.InputEventActionType
+    :param repeat: The number of times that the specified action must occur to be considered complete.
+    :type repeat: (optional) int
 
     """
     deserialized_types = {
         'gadget_ids': 'list[str]',
         'colors': 'list[str]',
-        'action': 'ask_sdk_model.services.game_engine.input_event_action_type.InputEventActionType'
-    }
+        'action': 'ask_sdk_model.services.game_engine.input_event_action_type.InputEventActionType',
+        'repeat': 'int'
+    }  # type: Dict
 
     attribute_map = {
         'gadget_ids': 'gadgetIds',
         'colors': 'colors',
-        'action': 'action'
-    }
+        'action': 'action',
+        'repeat': 'repeat'
+    }  # type: Dict
 
-    def __init__(self, gadget_ids=None, colors=None, action=None):
-        # type: (Optional[List[object]], Optional[List[object]], Optional[InputEventActionType]) -> None
+    def __init__(self, gadget_ids=None, colors=None, action=None, repeat=None):
+        # type: (Optional[List[object]], Optional[List[object]], Optional[InputEventActionType], Optional[int]) -> None
         """An object that provides all of the events that need to occur, in a specific order, for this recognizer to be true. Omitting any parameters in this object means \&quot;match anything\&quot;.
 
         :param gadget_ids: A whitelist of gadgetIds that are eligible for this match.
@@ -61,17 +65,20 @@ class Pattern(object):
         :type colors: (optional) list[str]
         :param action: 
         :type action: (optional) ask_sdk_model.services.game_engine.input_event_action_type.InputEventActionType
+        :param repeat: The number of times that the specified action must occur to be considered complete.
+        :type repeat: (optional) int
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.gadget_ids = gadget_ids
         self.colors = colors
         self.action = action
+        self.repeat = repeat
 
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

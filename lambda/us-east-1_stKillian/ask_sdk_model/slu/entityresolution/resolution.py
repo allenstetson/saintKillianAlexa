@@ -1,7 +1,7 @@
 # coding: utf-8
 
 #
-# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
 # except in compliance with the License. A copy of the License is located at
@@ -21,7 +21,7 @@ from enum import Enum
 
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List, Optional
+    from typing import Dict, List, Optional, Union
     from datetime import datetime
     from ask_sdk_model.slu.entityresolution.status import Status
     from ask_sdk_model.slu.entityresolution.value_wrapper import ValueWrapper
@@ -44,13 +44,13 @@ class Resolution(object):
         'authority': 'str',
         'status': 'ask_sdk_model.slu.entityresolution.status.Status',
         'values': 'list[ask_sdk_model.slu.entityresolution.value_wrapper.ValueWrapper]'
-    }
+    }  # type: Dict
 
     attribute_map = {
         'authority': 'authority',
         'status': 'status',
         'values': 'values'
-    }
+    }  # type: Dict
 
     def __init__(self, authority=None, status=None, values=None):
         # type: (Optional[str], Optional[Status], Optional[List[ValueWrapper]]) -> None
@@ -63,7 +63,7 @@ class Resolution(object):
         :param values: 
         :type values: (optional) list[ask_sdk_model.slu.entityresolution.value_wrapper.ValueWrapper]
         """
-        self.__discriminator_value = None
+        self.__discriminator_value = None  # type: str
 
         self.authority = authority
         self.status = status
@@ -72,7 +72,7 @@ class Resolution(object):
     def to_dict(self):
         # type: () -> Dict[str, object]
         """Returns the model properties as a dict"""
-        result = {}
+        result = {}  # type: Dict
 
         for attr, _ in six.iteritems(self.deserialized_types):
             value = getattr(self, attr)

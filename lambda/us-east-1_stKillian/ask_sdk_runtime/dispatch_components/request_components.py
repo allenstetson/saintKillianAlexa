@@ -97,16 +97,16 @@ class AbstractResponseInterceptor(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def process(self, handler_input, dispatch_output):
+    def process(self, handler_input, response):
         # type: (Input, Output) -> None
         """Process the input and the output after the Handler is run.
 
         :param handler_input: Generic input passed to the
             dispatcher.
         :type handler_input: Input
-        :param dispatch_output: Execution result of the Handler on
+        :param response: Execution result of the Handler on
             dispatch input.
-        :type dispatch_output: Union[None, Output]
+        :type response: Union[None, Output]
         :rtype: None
         """
         raise NotImplementedError
@@ -323,7 +323,7 @@ class GenericRequestMapper(AbstractRequestMapper):
         :raises: :py:class:`ask_sdk_runtime.exceptions.DispatchException`
             when any object inside the input list is of invalid type
         """
-        self._request_handler_chains = []
+        self._request_handler_chains = []  # type: List
         if request_handler_chains is not None:
             for chain in request_handler_chains:
                 self.add_request_handler_chain(request_handler_chain=chain)
