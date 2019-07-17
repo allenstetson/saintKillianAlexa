@@ -94,7 +94,7 @@ class Mass(object):
             bestMass = times[i][0]
             print("-- Best mass: {}".format(bestMass))
             print("-- nowTime: {}".format(nowTime))
-            while nowTime < bestMass:
+            while nowTime > bestMass:
                 print("-- Advancing to next mass")
                 i += 1
                 bestMass = times[i][0]
