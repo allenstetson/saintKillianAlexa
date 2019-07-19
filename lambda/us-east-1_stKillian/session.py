@@ -6,6 +6,10 @@ class KillianUserSession(object):
         self._sessionAttributes = self.populateAttrs()
 
     @property
+    def desiresReminder(self):
+        return self.slots.get("DESIRES_REMINDER", {}).get("value")
+
+    @property
     def massDay(self):
         return self.slots.get("massDay", {}).get("value")
 

@@ -37,7 +37,7 @@ class KillianDataManager(object):
             return None
 
         times = list()
-        for massString in item['massTimes']:
+        for massString in item['eventTimes']:
             if len(massString.split(",")) == 2:
                 hourNum, minNum = massString.split(",")
                 language = "english"

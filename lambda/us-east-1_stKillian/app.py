@@ -19,8 +19,9 @@ from ask_sdk_core.dispatch_components import (AbstractExceptionHandler,
     AbstractRequestHandler, AbstractRequestInterceptor,
     AbstractResponseInterceptor)
 from ask_sdk_core.utils import is_request_type, is_intent_name
-from ask_sdk_model import (Response, IntentRequest, DialogState,
-    SlotConfirmationStatus, Slot)
+from ask_sdk_model import (DialogState, Intent, IntentConfirmationStatus, 
+    IntentRequest, Response, SlotConfirmationStatus, Slot)
+from ask_sdk_model.dialog import DelegateDirective, ElicitSlotDirective
 from ask_sdk_model.services import ServiceException
 from ask_sdk_model.services.reminder_management import (
     Trigger, TriggerType, AlertInfo, SpokenInfo, SpokenText, PushNotification,
@@ -31,7 +32,7 @@ from ask_sdk_model.ui import (
 
 # Local imports
 import killian_data
-import mass
+import events
 import session
 
 sb = StandardSkillBuilder()
@@ -102,7 +103,7 @@ class MassTimeHandler(AbstractRequestHandler):
         userSession = session.KillianUserSession(handler_input)
 
         speech, reprompt, cardTitle, cardText, cardImage = \
-            mass.Mass(userSession).getMassTimeResponse()
+            events.Mass(userSession).getMassTimeResponse()
         handler_input.response_builder.speak(speech).ask(reprompt).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
         ).set_should_end_session(False)
@@ -113,7 +114,9 @@ class NextMassHandler(AbstractRequestHandler):
     """Object handling all initial requests."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled."""
-        return is_intent_name("NextMassIntent")(handler_input)
+        return (is_intent_name("NextMassIntent")(handler_input)
+                and handler_input.request_envelope.request.dialog_state == DialogState.STARTED)
+                #and not handler_input.request_envelope.request.dialog_state == DialogState.COMPLETED)
 
     def handle(self, handler_input):
         """Handle the launch request; fetch and serve appropriate response.
@@ -133,19 +136,72 @@ class NextMassHandler(AbstractRequestHandler):
         """
         userSession = session.KillianUserSession(handler_input)
 
+        envelope = handler_input.request_envelope
         speech, reprompt, cardTitle, cardText, cardImage = \
-            mass.Mass(userSession).getNextMassResponse()
-        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
-            StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(False)
+            events.Mass(userSession).getNextMassResponse()
+
+        nextMass = events.Mass(userSession).getNextMass()
+        if nextMass:
+            speech += ". Would you like me to remind you 30 minutes prior to mass?"
+            handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+                StandardCard(title=cardTitle, text=cardText, image=cardImage)
+            ).set_should_end_session(False)
+            #currentIntent = envelope.request.intent
+            nextIntent = Intent(
+                name="NotifyNextMassIntent",
+                confirmation_status=IntentConfirmationStatus.NONE,
+                slots = {
+                    "DESIRES_REMINDER": Slot(
+                        name="DESIRES_REMINDER",
+                        confirmation_status=SlotConfirmationStatus.NONE
+                    )
+                }
+            )
+            #handler_input.response_builder.add_directive(
+            #    DelegateDirective(updated_intent=nextIntent)
+            #)
+            handler_input.response_builder.add_directive(
+                ElicitSlotDirective(
+                    slot_to_elicit = "DESIRES_REMINDER",
+                    updated_intent = nextIntent
+                )
+            )
+            return handler_input.response_builder.response
+
+        # No next mass, so ... no reminder needed:
+        handler_input.response_builder.speak(speech).set_card(
+            StandardCard(title=cardTitle, text=cardText)
+        )
+        handler_input.response_builder.should_end_session(True)
         return handler_input.response_builder.response
+
 
 class NotifyNextMassHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         return is_intent_name("NotifyNextMassIntent")(handler_input)
 
     def handle(self, handler_input):
+        DEV_MODE = True
+        speech = ""
         logging.info("Running NotifyNextMassHandler")
+        userSession = session.KillianUserSession(handler_input)
+
+        negativeResponses = ["nah", "nope", "no thank you", "no thanks", "no"]
+
+        if userSession.desiresReminder:
+            if userSession.desiresReminder.lower() in negativeResponses:
+                logger.info("DESIRES_REMINDER slot indicates 'no'")
+                speech = "Okay."
+                cardTitle = "Next Mass"
+                cardText = "No reminder requested."
+                handler_input.response_builder.speak(speech).set_card(
+                    StandardCard(title=cardTitle, text=cardText)
+                )
+                handler_input.response_builder.set_should_end_session(True)
+                return handler_input.response_builder.response
+        else:
+            logger.info("No DESIRES_REMINDER slot filled.")
+
         responseBuilder = handler_input.response_builder
         requestEnvelope = handler_input.request_envelope
         permissions = requestEnvelope.context.system.user.permissions
@@ -164,7 +220,30 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         # Else, let's set up the permission
         logging.info("Necessary permissions found. Creating reminder.")
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
-        reminderTime = now + datetime.timedelta(minutes=+1)
+        massTime = events.Mass(userSession).getNextMass()
+        if not massTime:
+            logging.info("no next mass found for today")
+            speech = "Sorry, but it looks like there are no more masses today."
+            card = SimpleCard("St. Killian", "Reminder set for Mass.")
+            return responseBuilder.speak(speech).set_card(card) \
+                .set_should_end_session(True).response
+
+        massTime = massTime["time"]
+        todayEvent = datetime.datetime.combine(now, massTime)
+        reminderTime = todayEvent - datetime.timedelta(minutes=30)
+        timezone = pytz.timezone("America/Los_Angeles")
+        reminderTime = timezone.localize(reminderTime)
+        if reminderTime < now:
+            logging.info("too late. reminder is in the past.")
+            speech = "It looks like it's too late for a reminder. "
+            left = int(((reminderTime - now).seconds) / 60)
+            speech += "You only have {} minutes left until Mass.".format(left)
+            card = SimpleCard("St. Killian", "Reminder set for Mass.")
+            return responseBuilder.speak(speech).set_card(card) \
+                .set_should_end_session(True).response
+
+        if DEV_MODE:
+            reminderTime = now + datetime.timedelta(minutes=+1)
         reminderString = reminderTime.strftime("%Y-%m-%dT%H:%M:%S")
         trigger = Trigger(TriggerType.SCHEDULED_ABSOLUTE, reminderString,
                           time_zone_id="America/Los_Angeles")
@@ -181,7 +260,10 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             logger.error(e)
             raise e
 
-        speech = "I will remind you at {}:{}{} to leave for mass."
+        if DEV_MODE:
+            speech += "Okay. Since you are in demo mode, I'll remind "
+            speech += "in one minute to go to mass. "
+        speech += "I will remind you at {}:{}{} to leave for mass."
         hour = reminderTime.hour
         minute = "{:02d}".format(reminderTime.minute)
         if hour >= 12:
@@ -227,8 +309,32 @@ class ParishPhoneHandler(AbstractRequestHandler):
 
 
 # =============================================================================
-# Fallback Handler
+# Standard Handlers
 # =============================================================================
+class CancelAndStopIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled."""
+        return not (not is_intent_name("AMAZON.CancelIntent")(handler_input)
+                and not is_intent_name("AMAZON.StopIntent")(handler_input)
+                and not is_intent_name("AMAZON.PauseIntent")(handler_input))
+
+    def handle(self, handler_input):
+        """Handle the launch request; fetch and serve appropriate response.
+        
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        """
+        speech = "Canceling"
+        # See AudioPlayer code - will become relevant
+        responseBuilder = handler_input.response_builder
+        responseBuilder.speak(speech).ask(speech)
+        #directive = audioplayer.StopDirective()
+        #responseBuilder.add_directive(directive)
+        responseBuilder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
 class FallbackIntentHandler(AbstractRequestHandler):
     """Handler for fallback intent."""
     def can_handle(self, handler_input):
@@ -319,7 +425,7 @@ def getParishPhoneResponse():
 
 def getWelcomeResponse():
     speech = "Welcome to Saint Killian Parish, Mission Viejo. You can ask "
-    speech += "when is the next Mass. Other options are coming soon."
+    speech += "when is the next Mass."
     reprompt = "Try asking: when is the next Mass."
     title = "St. Killian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"
@@ -329,6 +435,7 @@ def getWelcomeResponse():
 # =============================================================================
 # Skill Builder
 # =============================================================================
+sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(MassTimeHandler())

@@ -66,22 +66,34 @@ class Mass(object):
         cardImage = None
         return speech, reprompt, title, text, cardImage
 
-
-    def getNextMassResponse(self):
-        speech = ""
+    def getNextMass(self):
         dataManager = killian_data.KillianDataManager()
         today = datetime.datetime.now(tz=pytz.utc)
-        logger.info("-- today (utc?): {}".format(today))
         timezone = pytz.timezone("America/Los_Angeles")
         todayLocal = today.astimezone(timezone)
-        logger.info("-- today (local): {}".format(todayLocal))
         todayNum = todayLocal.weekday()
         times = dataManager.getMassTimes(todayNum)
-        # TODO: If not times...
+        if not times:
+            return None
         lastMassTime = times[-1][0]
         nowTime = todayLocal.time()
         logger.info("Mass today?({}), at {}".format(todayNum, nowTime))
         if nowTime > lastMassTime:
+            logger.info("No more masses today({}), at {}".format(todayNum, nowTime))
+            return None
+        i = 0
+        bestMass = times[i][0]
+        while nowTime > bestMass:
+            i += 1
+            bestMass = times[i][0]
+            language = times[i][1]
+        print("-- Chosen Mass {}".format(bestMass))
+        return {"time": bestMass, "language": language}
+
+    def getNextMassResponse(self):
+        speech = ""
+        nextMass = self.getNextMass()
+        if not nextMass:
             logger.info("No more masses today({}), at {}".format(todayNum, nowTime))
             speech += "There are no more masses today. "
             tSpeech, reprompt, _, _, _ = self.getMassTimeResponse(
@@ -90,16 +102,9 @@ class Mass(object):
             speech += tSpeech
         else:
             i = 0
-            print("-- Times: {}".format(times))
-            bestMass = times[i][0]
-            print("-- Best mass: {}".format(bestMass))
-            print("-- nowTime: {}".format(nowTime))
-            while nowTime > bestMass:
-                print("-- Advancing to next mass")
-                i += 1
-                bestMass = times[i][0]
-            print("-- Chosen Mass {}".format(bestMass))
-            massString = convertMassToString(bestMass, language=times[i][1])
+            bestMass = nextMass["time"]
+            language = nextMass["language"]
+            massString = convertMassToString(bestMass, language=language)
             speech = "The next mass today will be at {}".format(massString)
             reprompt = "What else can I do for you?"
         title = "Next Mass"
@@ -107,6 +112,10 @@ class Mass(object):
         cardImage = None
         return speech, reprompt, title, text, cardImage
 
+
+# =============================================================================
+# Functions
+# =============================================================================
 def convertMassToString(massTime, language="english"):
     hour = massTime.hour
     if hour > 11:
