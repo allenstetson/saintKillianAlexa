@@ -98,7 +98,7 @@ class KillianDataManager(object):
             self.dbTable.update_item(
                 TableName="StKillian",
                 Key={"namespace": userId},
-                UpdateExpression="set lastToken=:o, lastTrack:k",
+                UpdateExpression="set lastToken=:o, lastTrack=:k",
                 ExpressionAttributeValues={
                     ":o": dbEntry.get("lastToken", ""),
                     ":k": dbEntry.get("lastTrack", "")

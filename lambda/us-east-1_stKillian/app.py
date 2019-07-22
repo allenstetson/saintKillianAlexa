@@ -95,13 +95,15 @@ class LatestHomilyHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         userSession = session.KillianUserSession(handler_input)
         homily = audio.Homily(userSession)
-        speech, title, text, directive = homily.getLatestHomily()
+        speech, title, text, directive, sessionAttrs = \
+            homily.getLatestHomily()
 
         card = StandardCard(title=title, text=text)
         handler_input.response_builder.speak(speech)
         handler_input.response_builder.set_card(card)
         handler_input.response_builder.add_directive(directive)
         handler_input.response_builder.set_should_end_session(True)
+        handler_input.attributes_manager.session_attributes = sessionAttrs
         return handler_input.response_builder.response
 
 
@@ -487,9 +489,11 @@ class AudioStartOverIntentHandler(AbstractRequestHandler):
         return is_intent_name("AMAZON.StartOverIntent")(handler_input)
 
     def handle(self, handler_input):
-        userSession = session.KillianUserSession(handler_input)
-        track = userSession.lastTrack
-        token = userSession.lastToken
+        userId = handler_input.request_envelope.context.system.user.user_id
+        dataMan = killian_data.KillianDataManager()
+        dbEntry = dataMan.getUserDatabaseEntry(userId)
+        track = dbEntry.get("lastTrack")
+        token = dbEntry.get("lastToken")
         if not track:
             logger.info("No lastTrack found in database! Can't start over.")
             return {}
@@ -508,7 +512,7 @@ class AudioStartOverIntentHandler(AbstractRequestHandler):
                 ),
                 metadata=AudioItemMetadata(
                     title="Latest Homily",
-                    subtitle=text,
+                    subtitle="Latest Homily",
                 )
             )
         )

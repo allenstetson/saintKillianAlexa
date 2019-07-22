@@ -103,8 +103,10 @@ class AttributesManager(object):
         self._persistence_attributes = {}  # type: Dict
         self._request_attributes = {}  # type: Dict
         if not self._request_envelope.session:
-            raise AttributesManagerException(
-                "Cannot get SessionAttributes from out of session request!")
+            self._session_attributes = {}  # type: Dict
+            # ALLEN:
+            #raise AttributesManagerException(
+            #    "Cannot get SessionAttributes from out of session request!")
         else:
             if not self._request_envelope.session.attributes:
                 self._session_attributes = {}  # type: Dict
