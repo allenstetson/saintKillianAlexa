@@ -69,3 +69,44 @@ class KillianDataManager(object):
 
         return item['phoneNumber']
 
+    def getUserDatabaseEntry(self, userId):
+        msg = "Attempting to find user entry for userId..."
+        logger.info(msg)
+
+        item = None
+        try:
+            response = self.dbTable.get_item(
+                TableName="StKillian",
+                Key={'namespace': userId}
+            )
+            if not "Item" in response:
+                logger.info("New user!")
+                return {}
+            item = response['Item']
+        except ClientError as e:
+            logger.info("get_item for userId failed.")
+            logger.error(e.response['Error']['Message'])
+            return None
+
+        return item
+
+    def updateUserDatabaseEntry(self, userId, dbEntry):
+        msg = "Attempting to write user data..."
+        logger.info(msg)
+
+        try:
+            self.dbTable.update_item(
+                TableName="StKillian",
+                Key={"namespace": userId},
+                UpdateExpression="set lastToken=:o, lastTrack:k",
+                ExpressionAttributeValues={
+                    ":o": dbEntry.get("lastToken", ""),
+                    ":k": dbEntry.get("lastTrack", "")
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+            return True
+        except ClientError as e:
+            logger.info("ClientError received!")
+            logger.error(e.response["Error"]["Message"])
+            return False

@@ -14,13 +14,21 @@ import pytz
 import random
 
 # ASK imports
+# - standard/core
 from ask_sdk.standard import StandardSkillBuilder
 from ask_sdk_core.dispatch_components import (AbstractExceptionHandler,
     AbstractRequestHandler, AbstractRequestInterceptor,
     AbstractResponseInterceptor)
 from ask_sdk_core.utils import is_request_type, is_intent_name
+
+# - model
 from ask_sdk_model import (DialogState, Intent, IntentConfirmationStatus, 
     IntentRequest, Response, SlotConfirmationStatus, Slot)
+from ask_sdk_model.interfaces.audioplayer import (
+    PlayDirective, PlayBehavior, AudioItem, Stream, AudioItemMetadata,
+    StopDirective, PlaybackNearlyFinishedRequest)
+from ask_sdk_model.interfaces.audioplayer.audio_player_state import (
+    AudioPlayerState)
 from ask_sdk_model.dialog import DelegateDirective, ElicitSlotDirective
 from ask_sdk_model.services import ServiceException
 from ask_sdk_model.services.reminder_management import (
@@ -31,6 +39,7 @@ from ask_sdk_model.ui import (
     AskForPermissionsConsentCard, SimpleCard, StandardCard)
 
 # Local imports
+import audio
 import killian_data
 import events
 import session
@@ -78,6 +87,24 @@ class LaunchRequestHandler(AbstractRequestHandler):
 # =============================================================================
 # Handlers
 # =============================================================================
+class LatestHomilyHandler(AbstractRequestHandler):
+    """Triggers playback of the latest homily."""
+    def can_handle(self, handler_input):
+        return is_intent_name("LatestHomilyIntent")(handler_input)
+
+    def handle(self, handler_input):
+        userSession = session.KillianUserSession(handler_input)
+        homily = audio.Homily(userSession)
+        speech, title, text, directive = homily.getLatestHomily()
+
+        card = StandardCard(title=title, text=text)
+        handler_input.response_builder.speak(speech)
+        handler_input.response_builder.set_card(card)
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
 class MassTimeHandler(AbstractRequestHandler):
     """Object handling all initial requests."""
     def can_handle(self, handler_input):
@@ -366,6 +393,159 @@ class FallbackIntentHandler(AbstractRequestHandler):
 
 
 # =============================================================================
+# Audio Handlers
+# =============================================================================
+class AudioNextIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.NextIntent")(handler_input)
+
+    def handle(self, handler_input):
+        handler_input.response_builder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
+class AudioPlaybackFinishedHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_request_type("AudioPlayer.PlaybackFinished")(handler_input)
+
+    def handle(self, handler_input):
+        return {}
+
+
+class AudioPlaybackNearlyFinishedHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_request_type("AudioPlayer.PlaybackNearlyFinished")(handler_input)
+
+    def handle(self, handler_input):
+        handler_input.response_builder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
+class AudioPlaybackStartedHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_request_type("AudioPlayer.PlaybackStarted")(handler_input)
+
+    def handle(self, handler_input):
+        return {}
+
+
+class AudioPlaybackStoppedHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_request_type("AudioPlayer.PlaybackStopped")(handler_input)
+
+    def handle(self, handler_input):
+        token = handler_input.request_envelope.request.token
+        oim = handler_input.request_envelope.request.offset_in_milliseconds
+        #userSession = session.KillianUserSession(handler_input)
+        #userSession.setAudioState(token, oim)
+
+        return {}
+
+
+class AudioPreviousIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AudioPlayer.PreviousIntent")(handler_input)
+
+    def handle(self, handler_input):
+        return {}
+
+
+class AudioResumeIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AudioPlayer.ResumeIntent")(handler_input)
+
+    def handle(self, handler_input):
+        track = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"
+        track = "https://dart-battle-resources.s3.amazonaws.com/sndtrk/sndtrk_Arctic_Music_Sfx_30s.mp3"
+        token = "06-17-19_TheChristianLifeIsLikeAJob"
+        offsetInMilliseconds = 3000
+        title = "Latest Homily"
+        text = "June 17, 2019 Fr. Dwyer",
+
+        directive = PlayDirective(
+            play_behavior=PlayBehavior.REPLACE_ALL,
+            audio_item=AudioItem(
+                stream=Stream(
+                    expected_previous_token=None,
+                    token=token,
+                    url=track,
+                    offset_in_milliseconds=offsetInMilliseconds
+                ),
+                metadata=AudioItemMetadata(
+                    title="Latest Homily",
+                    subtitle=text,
+                )
+            )
+        )
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
+class AudioStartOverIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.StartOverIntent")(handler_input)
+
+    def handle(self, handler_input):
+        userSession = session.KillianUserSession(handler_input)
+        track = userSession.lastTrack
+        token = userSession.lastToken
+        if not track:
+            logger.info("No lastTrack found in database! Can't start over.")
+            return {}
+        logger.info("Starting over, track: {}".format(track))
+
+        offsetInMilliseconds = 0
+
+        directive = PlayDirective(
+            play_behavior=PlayBehavior.REPLACE_ALL,
+            audio_item=AudioItem(
+                stream=Stream(
+                    expected_previous_token=None,
+                    token=token,
+                    url=track,
+                    offset_in_milliseconds=offsetInMilliseconds
+                ),
+                metadata=AudioItemMetadata(
+                    title="Latest Homily",
+                    subtitle=text,
+                )
+            )
+        )
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
+class AudioStopIntentHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return (is_intent_name("AMAZON.CancelIntent")(handler_input) or
+                is_intent_name("AMAZON.StopIntent")(handler_input) or
+                is_intent_name("AMAZON.PauseIntent")(handler_input)
+               )
+
+    def handle(self, handler_input):
+        directive = StopDirective()
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+
+        return handler_input.response_builder.response
+
+
+class AudioUnsupportedHandler(AbstractRequestHandler):
+    def can_handle(self, handler_input):
+        return (is_intent_name("AMAZON.LoopOffIntent")(handler_input) or
+                is_intent_name("AMAZON.LoopOnIntent")(handler_input) or
+                is_intent_name("AMAZON.RepeatIntent")(handler_input) or
+                is_intent_name("AMAZON.ShuffleOffIntent")(handler_input) or
+                is_intent_name("AMAZON.ShuffleOnIntent")(handler_input)
+               )
+
+    def handle(self, handler_input):
+        return {}
+
+
+# =============================================================================
 # Request and Response Loggers
 # =============================================================================
 class RequestLogger(AbstractRequestInterceptor):
@@ -435,8 +615,20 @@ def getWelcomeResponse():
 # =============================================================================
 # Skill Builder
 # =============================================================================
+sb.add_request_handler(AudioNextIntentHandler())
+sb.add_request_handler(AudioPlaybackFinishedHandler())
+sb.add_request_handler(AudioPlaybackNearlyFinishedHandler())
+sb.add_request_handler(AudioPlaybackStartedHandler())
+sb.add_request_handler(AudioPlaybackStoppedHandler())
+sb.add_request_handler(AudioPreviousIntentHandler())
+sb.add_request_handler(AudioResumeIntentHandler())
+sb.add_request_handler(AudioStartOverIntentHandler())
+sb.add_request_handler(AudioStopIntentHandler())
+sb.add_request_handler(AudioUnsupportedHandler())
+
 sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
+sb.add_request_handler(LatestHomilyHandler())
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(MassTimeHandler())
 sb.add_request_handler(NextMassHandler())

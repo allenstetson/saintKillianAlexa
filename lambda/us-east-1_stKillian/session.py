@@ -1,17 +1,53 @@
+import killian_data
+
 class KillianUserSession(object):
     def __init__(self, handler_input):
+        self._dataMan = killian_data.KillianDataManager()
+        self._dbEntry = {}
         self._handler_input = handler_input
+        self._userId = None
         self.slots = {}
 
         self._sessionAttributes = self.populateAttrs()
+
+    @property
+    def dbEntry(self):
+        if self._dbEntry:
+            return self._dbEntry
+        self._dbEntry = self._dataMan.getUserDatabaseEntry(self.userId)
+        return self._dbEntry
 
     @property
     def desiresReminder(self):
         return self.slots.get("DESIRES_REMINDER", {}).get("value")
 
     @property
+    def lastToken(self):
+        return self.dbEntry.get("lastToken", "")
+
+    @lastToken.setter
+    def lastToken(self, value):
+        self._dbEntry["lastToken"] = value
+
+    @property
+    def lastTrack(self):
+        return self.dbEntry.get("lastTrack", "")
+
+    @lastTrack.setter
+    def lastTrack(self, value):
+        self._dbEntry["lastTrack"] = value
+
+    @property
     def massDay(self):
         return self.slots.get("massDay", {}).get("value")
+
+    @property
+    def userId(self):
+        if self._userId:
+            return self._userId
+        env = self._handler_input.request_envelope
+        self._userId = env.context.system.user.user_id
+        return self._userId
 
     def populateAttrs(self):
         print("populating attrs")
@@ -41,4 +77,7 @@ class KillianUserSession(object):
                 slots[slotName]['id'] = None
         print("Slots: {}".format(slots))
         self.slots = slots
+
+    def savePersistentAttrs(self):
+        self._dataMan.updateUserDatabaseEntry(self.userId, self.dbEntry)
 
