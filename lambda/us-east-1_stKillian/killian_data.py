@@ -4,17 +4,48 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-from botocore.exceptions import ClientError
 import boto3
+from boto3.dynamodb.conditions import Key, Attr
+from botocore.exceptions import ClientError
 
 class KillianDataManager(object):
     def __init__(self):
-        dynamodb = boto3.resource(
+        self.dynamodb = boto3.resource(
             "dynamodb",
             region_name="us-east-1",
             endpoint_url="http://dynamodb.us-east-1.amazonaws.com"
         )
-        self.dbTable = dynamodb.Table("StKillian")
+        self.dbTable = self.dynamodb.Table("StKillian")
+
+    def getCalendarEvents(self, monthOffset=0):
+        msg = "Attempting to retrieve calendar events from db"
+        logger.info(msg)
+
+        now = datetime.datetime.now()
+        month = now.month
+        month += monthOffset
+        if month > 12:
+            month = month - 12
+        elif month < 1:
+            month = month + 12
+
+        item = None
+        try:
+            fe = Key("eventCategory").eq("calendar")
+            response = self.dbTable.scan(
+                FilterExpression=fe,
+            )
+            logger.info("response: {}".format(response))
+            if response['Count'] == 0:
+                logger.info("No items found for query.")
+                return []
+            return response['Items']
+
+        except ClientError as e:
+            logger.info("get_item for mass times failed.")
+            logger.error(e.response['Error']['Message'])
+            return []
+
 
     def getMassTimes(self, dayEnum):
         msg = "Attempting to retrieve mass times for {} from db"
@@ -98,10 +129,11 @@ class KillianDataManager(object):
             self.dbTable.update_item(
                 TableName="StKillian",
                 Key={"namespace": userId},
-                UpdateExpression="set lastToken=:o, lastTrack=:k",
+                UpdateExpression="set lastToken=:o, lastTrack=:k, offsetInMilliseconds=:f",
                 ExpressionAttributeValues={
                     ":o": dbEntry.get("lastToken", ""),
-                    ":k": dbEntry.get("lastTrack", "")
+                    ":k": dbEntry.get("lastTrack", ""),
+                    ":f": dbEntry.get("offsetInMilliseconds", 0)
                 },
                 ReturnValues="UPDATED_NEW"
             )

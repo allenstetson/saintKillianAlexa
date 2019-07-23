@@ -9,6 +9,23 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
+class Calendar(object):
+    def __init__(self, userSession):
+        self.userSession = userSession
+
+    def getNextEvents(numEvents=3):
+        dataManager = killian_data.KillianDataManager()
+        items = dataManager.getCalendarEvents()
+        logger.info("items found: {}".format(items))
+
+        speech = "Okay cool."
+        reprompt = "You cool? I'm cool."
+        title = "Cool stuff, bro."
+        text = title
+        cardImage = None
+        return speech, reprompt, title, text, cardImage
+
+
 class Mass(object):
     def __init__(self, userSession):
         self.userSession = userSession

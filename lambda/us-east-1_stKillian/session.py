@@ -9,6 +9,7 @@ class KillianUserSession(object):
         self.slots = {}
 
         self._sessionAttributes = self.populateAttrs()
+        self.populateDbEntry()
 
     @property
     def dbEntry(self):
@@ -42,6 +43,14 @@ class KillianUserSession(object):
         return self.slots.get("massDay", {}).get("value")
 
     @property
+    def offsetInMilliseconds(self):
+        return self._dbEntry.get("offsetInMilliseconds", 0)
+
+    @offsetInMilliseconds.setter
+    def offsetInMilliseconds(self, value):
+        self._dbEntry["offsetInMilliseconds"] = value
+
+    @property
     def userId(self):
         if self._userId:
             return self._userId
@@ -55,6 +64,10 @@ class KillianUserSession(object):
             self._handler_input.attributes_manager.request_attributes
         self._sessionAttributes["userId"] = \
             self._handler_input.request_envelope.context.system.user.user_id
+
+        # If this is a request such as PlaybackStopped, it won't have an intent
+        if not hasattr(self._handler_input.request_envelope.request, "intent"):
+            return
 
         filledSlots = self._handler_input.request_envelope.request.intent.slots
         print("Filled slots: {} ({})".format(filledSlots, type(filledSlots)))
@@ -77,6 +90,9 @@ class KillianUserSession(object):
                 slots[slotName]['id'] = None
         print("Slots: {}".format(slots))
         self.slots = slots
+
+    def populateDbEntry(self):
+        self._dbEntry = self._dataMan.getUserDatabaseEntry(self.userId)
 
     def savePersistentAttrs(self):
         self._dataMan.updateUserDatabaseEntry(self.userId, self.dbEntry)

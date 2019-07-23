@@ -87,6 +87,37 @@ class LaunchRequestHandler(AbstractRequestHandler):
 # =============================================================================
 # Handlers
 # =============================================================================
+class CalendarEventHandler(AbstractRequestHandler):
+    """Object handling all initial requests."""
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled."""
+        return is_intent_name("CalendarEventIntent")(handler_input)
+
+    def handle(self, handler_input):
+        """Handle the launch request; fetch and serve appropriate response.
+        
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Raises:
+            ValueError:
+                If something other than the sanctioned app calls this intent.
+
+        Returns:
+            ask_sdk_model.response.Response
+                Response for this intent and device.
+        
+        """
+        userSession = session.KillianUserSession(handler_input)
+
+        speech, reprompt, cardTitle, cardText, cardImage = \
+            events.Calendar(userSession).getNextEvents()
+        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+            StandardCard(title=cardTitle, text=cardText, image=cardImage)
+        ).set_should_end_session(True)
+        return handler_input.response_builder.response
+
 class LatestHomilyHandler(AbstractRequestHandler):
     """Triggers playback of the latest homily."""
     def can_handle(self, handler_input):
@@ -436,10 +467,16 @@ class AudioPlaybackStoppedHandler(AbstractRequestHandler):
         return is_request_type("AudioPlayer.PlaybackStopped")(handler_input)
 
     def handle(self, handler_input):
-        token = handler_input.request_envelope.request.token
+        msg = "Audio playback stopped."
+        logger.info(msg)
+
         oim = handler_input.request_envelope.request.offset_in_milliseconds
-        #userSession = session.KillianUserSession(handler_input)
-        #userSession.setAudioState(token, oim)
+        userSession = session.KillianUserSession(handler_input)
+        userSession.offsetInMilliseconds = oim
+        userSession.savePersistentAttrs()
+
+        msg = "Stored offsetInMilliseconds: {}".format(oim)
+        logger.info(msg)
 
         return {}
 
@@ -454,15 +491,21 @@ class AudioPreviousIntentHandler(AbstractRequestHandler):
 
 class AudioResumeIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
-        return is_intent_name("AudioPlayer.ResumeIntent")(handler_input)
+        return (is_intent_name("AudioPlayer.ResumeIntent")(handler_input) or
+                is_intent_name("AMAZON.ResumeIntent")(handler_input)
+               )
 
     def handle(self, handler_input):
-        track = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"
-        track = "https://dart-battle-resources.s3.amazonaws.com/sndtrk/sndtrk_Arctic_Music_Sfx_30s.mp3"
-        token = "06-17-19_TheChristianLifeIsLikeAJob"
-        offsetInMilliseconds = 3000
+        msg = "Resuming audio playback..."
+        logger.info(msg)
+
+        userSession = session.KillianUserSession(handler_input)
+        track = userSession.lastTrack
+        token = userSession.lastToken
+        offsetInMilliseconds = userSession.offsetInMilliseconds
+
         title = "Latest Homily"
-        text = "June 17, 2019 Fr. Dwyer",
+        text = title
 
         directive = PlayDirective(
             play_behavior=PlayBehavior.REPLACE_ALL,
@@ -529,6 +572,19 @@ class AudioStopIntentHandler(AbstractRequestHandler):
                )
 
     def handle(self, handler_input):
+        msg = "Cancel, Stop, or Pause intent received."
+        logger.info(msg)
+
+        env = handler_input.request_envelope
+        audioPlayer = env.context.audio_player
+        if audioPlayer.to_dict().get("player_activity") == "STOPPED":
+            logger.info("Audio player has been stopped.")
+            oim = audioPlayer.to_dict().get("offset_in_milliseconds", 0)
+            userSession = session.KillianUserSession(handler_input)
+            userSession.offsetInMilliseconds = oim
+            logger.info("Saving offset of {} milliseconds".format(oim))
+            userSession.savePersistentAttrs()
+
         directive = StopDirective()
         handler_input.response_builder.add_directive(directive)
         handler_input.response_builder.set_should_end_session(True)
@@ -630,6 +686,7 @@ sb.add_request_handler(AudioStartOverIntentHandler())
 sb.add_request_handler(AudioStopIntentHandler())
 sb.add_request_handler(AudioUnsupportedHandler())
 
+sb.add_request_handler(CalendarEventHandler())
 sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(LatestHomilyHandler())
