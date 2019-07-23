@@ -44,7 +44,7 @@ class KillianDataManager(object):
             items = response['Items']
 
         except ClientError as e:
-            logger.info("get_item for mass times failed.")
+            logger.info("query for calendar events failed.")
             logger.error(e.response['Error']['Message'])
             return []
 
@@ -60,6 +60,39 @@ class KillianDataManager(object):
             if now > eventDatetime:
                 continue
             found.append((item, eventDatetime))
+        found = sorted(found, key=lambda x: x[1])
+        return found
+
+    def getConfessions(self):
+        msg = "Attempting to retrieve confessions from db"
+        logger.info(msg)
+
+        now = datetime.datetime.now()
+
+        items = []
+        try:
+            fe = Key("eventCategory").eq("confession")
+            response = self.dbTable.scan(
+                FilterExpression=fe,
+            )
+            logger.info("response: {}".format(response))
+            if response['Count'] == 0:
+                logger.info("No items found for query.")
+                return []
+            items = response['Items']
+
+        except ClientError as e:
+            logger.info("query for confession failed.")
+            logger.error(e.response['Error']['Message'])
+            return []
+
+        found = []
+        for item in items:
+            if item["dayEnum"] < now.weekday():
+                order = item["dayEnum"] + 7
+            else:
+                order = item["dayEnum"]
+            found.append((item, order))
         found = sorted(found, key=lambda x: x[1])
         return found
 

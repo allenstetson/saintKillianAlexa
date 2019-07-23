@@ -118,6 +118,35 @@ class CalendarEventHandler(AbstractRequestHandler):
         ).set_should_end_session(True)
         return handler_input.response_builder.response
 
+class ConfessionHandler(AbstractRequestHandler):
+    """Object handling all initial requests."""
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled."""
+        return is_intent_name("ConfessionIntent")(handler_input)
+
+    def handle(self, handler_input):
+        """Handle the launch request; fetch and serve appropriate response.
+        
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Raises:
+            ValueError:
+                If something other than the sanctioned app calls this intent.
+
+        Returns:
+            ask_sdk_model.response.Response
+                Response for this intent and device.
+        
+        """
+        speech, reprompt, cardTitle, cardText, cardImage = \
+            events.Confession().getNextConfession()
+        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+            StandardCard(title=cardTitle, text=cardText, image=cardImage)
+        ).set_should_end_session(True)
+        return handler_input.response_builder.response
+
 class LatestHomilyHandler(AbstractRequestHandler):
     """Triggers playback of the latest homily."""
     def can_handle(self, handler_input):
@@ -687,6 +716,7 @@ sb.add_request_handler(AudioStopIntentHandler())
 sb.add_request_handler(AudioUnsupportedHandler())
 
 sb.add_request_handler(CalendarEventHandler())
+sb.add_request_handler(ConfessionHandler())
 sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(LatestHomilyHandler())

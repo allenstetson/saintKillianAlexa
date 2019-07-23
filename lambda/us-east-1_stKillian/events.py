@@ -16,6 +16,8 @@ class Calendar(object):
     def getNextEvents(self, numEvents=3):
         dataManager = killian_data.KillianDataManager()
         items = dataManager.getCalendarEvents()
+        if not items:
+            items = dataManager.getCalendarEvents(monthOffset=1)
         logger.info("items found: {}".format(items))
 
         if len(items) > numEvents:
@@ -50,6 +52,32 @@ class Calendar(object):
 
         reprompt = "What else can I help you with? "
         title = "Upcoming Events"
+        text = speech
+        cardImage = None
+        return speech, reprompt, title, text, cardImage
+
+
+class Confession(object):
+    def getNextConfession(self, numEvents=3):
+        dataManager = killian_data.KillianDataManager()
+        items = dataManager.getConfessions()
+        logger.info("items found: {}".format(items))
+
+        speech = "The sacrament of reconciliation will be available, "
+
+        for item in items:
+            speech += item[0]["dayName"] + ", "
+            for timeStr in item[0]["eventTimes"]:
+                cTime = datetime.time(
+                    int(timeStr.split(",")[0]),
+                    int(timeStr.split(",")[1])
+                )
+                speech += cTime.strftime("%I:%M %p")
+                speech += ", "
+
+        speech += "."
+        reprompt = "What else can I help you with? "
+        title = "Confession"
         text = speech
         cardImage = None
         return speech, reprompt, title, text, cardImage
