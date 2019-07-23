@@ -29,9 +29,11 @@ class KillianDataManager(object):
         elif month < 1:
             month = month + 12
 
-        item = None
+        items = []
         try:
-            fe = Key("eventCategory").eq("calendar")
+            fe = Key("eventCategory").eq("calendar") & \
+                 Key("eventYear").eq(now.year) & \
+                 Key("eventMonth").eq(month)
             response = self.dbTable.scan(
                 FilterExpression=fe,
             )
@@ -39,13 +41,27 @@ class KillianDataManager(object):
             if response['Count'] == 0:
                 logger.info("No items found for query.")
                 return []
-            return response['Items']
+            items = response['Items']
 
         except ClientError as e:
             logger.info("get_item for mass times failed.")
             logger.error(e.response['Error']['Message'])
             return []
 
+        found = []
+        for item in items:
+            eventDatetime = datetime.datetime(
+                item["eventYear"],
+                item["eventMonth"],
+                item["eventDay"],
+                int(item["eventTimeStart"].split(":")[0]),
+                int(item["eventTimeStart"].split(":")[1])
+            )
+            if now > eventDatetime:
+                continue
+            found.append((item, eventDatetime))
+        found = sorted(found, key=lambda x: x[1])
+        return found
 
     def getMassTimes(self, dayEnum):
         msg = "Attempting to retrieve mass times for {} from db"

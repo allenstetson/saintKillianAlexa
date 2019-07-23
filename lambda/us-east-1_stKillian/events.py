@@ -13,15 +13,44 @@ class Calendar(object):
     def __init__(self, userSession):
         self.userSession = userSession
 
-    def getNextEvents(numEvents=3):
+    def getNextEvents(self, numEvents=3):
         dataManager = killian_data.KillianDataManager()
         items = dataManager.getCalendarEvents()
         logger.info("items found: {}".format(items))
 
-        speech = "Okay cool."
-        reprompt = "You cool? I'm cool."
-        title = "Cool stuff, bro."
-        text = title
+        if len(items) > numEvents:
+            items = items[:numEvents]
+
+        if len(items) == 1:
+            phrase = "event is"
+        else:
+            phrase = "{} events are".format(len(items))
+
+        speech = "The next {}, ".format(phrase)
+
+        for item in items:
+            speech += item[0]["eventTitle"]
+            speech += ", on "
+            eventDate = item[1].strftime("%A, %B %d")
+            speech += "{}, ".format(eventDate)
+            if "eventTimeEnd" in item[0]:
+                eventStartTime = item[1].strftime("%I:%M %p")
+                eventEndTime = datetime.datetime(
+                    item[0]["eventYear"],
+                    item[0]["eventMonth"],
+                    item[0]["eventDay"],
+                    int(item[0]["eventTimeEnd"].split(":")[0]),
+                    int(item[0]["eventTimeEnd"].split(":")[1])
+                )
+                eventEndTime = eventEndTime.strftime("%I:%M %p")
+                speech += "from {} to {}. ".format(eventTime, eventEndTime)
+            else:
+                eventTime = item[1].strftime("%I:%M %p")
+                speech += "at {}. ".format(eventTime)
+
+        reprompt = "What else can I help you with? "
+        title = "Upcoming Events"
+        text = speech
         cardImage = None
         return speech, reprompt, title, text, cardImage
 
