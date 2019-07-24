@@ -2,7 +2,19 @@
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
 # authorized representitives of St. Killian Parish, Mission Viejo, CA.
 ###############################################################################
-"""Application for Amazon Alexa devices: "Saint Killian". """
+"""Application for Amazon Alexa devices: "Saint Killian".
+
+Sample phrases:
+ * Alexa, open Saint Killian
+ * When is the next mass
+ * When is mass on Sunday
+ * When is confession
+ * What is on the calendar
+ * Play the latest homily
+ * Remind me to go to mass
+ * What is the parish phone number
+
+"""
 
 # =============================================================================
 # Imports
@@ -25,23 +37,39 @@ from ask_sdk_core.utils import is_request_type, is_intent_name
 from ask_sdk_model import (DialogState, Intent, IntentConfirmationStatus, 
     IntentRequest, Response, SlotConfirmationStatus, Slot)
 from ask_sdk_model.interfaces.audioplayer import (
-    PlayDirective, PlayBehavior, AudioItem, Stream, AudioItemMetadata,
-    StopDirective, PlaybackNearlyFinishedRequest)
+    AudioItem,
+    AudioItemMetadata,
+    PlaybackNearlyFinishedRequest,
+    PlayBehavior,
+    PlayDirective,
+    Stream,
+    StopDirective,
+)
 from ask_sdk_model.interfaces.audioplayer.audio_player_state import (
     AudioPlayerState)
 from ask_sdk_model.dialog import DelegateDirective, ElicitSlotDirective
 from ask_sdk_model.services import ServiceException
 from ask_sdk_model.services.reminder_management import (
-    Trigger, TriggerType, AlertInfo, SpokenInfo, SpokenText, PushNotification,
-    PushNotificationStatus, ReminderRequest)
+    AlertInfo,
+    PushNotification,
+    PushNotificationStatus,
+    ReminderRequest,
+    SpokenInfo,
+    SpokenText,
+    Trigger,
+    TriggerType,
+)
 from ask_sdk_model.slu.entityresolution import StatusCode
 from ask_sdk_model.ui import (
-    AskForPermissionsConsentCard, SimpleCard, StandardCard)
+    AskForPermissionsConsentCard,
+    SimpleCard,
+    StandardCard
+)
 
 # Local imports
 import audio
-import killian_data
 import events
+import killian_data
 import session
 
 sb = StandardSkillBuilder()
@@ -52,7 +80,7 @@ logger.setLevel(logging.INFO)
 # Main Handler
 # =============================================================================
 class LaunchRequestHandler(AbstractRequestHandler):
-    """Object handling all initial requests."""
+    """Object handling all initial requests. Launches the skill."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled."""
         return is_request_type("LaunchRequest")(handler_input)
@@ -65,12 +93,12 @@ class LaunchRequestHandler(AbstractRequestHandler):
                 Input from Alexa.
 
         Raises:
-            ValueError:
-                If something other than the sanctioned app calls this intent.
+            ValueError: If something other than the sanctioned app calls this
+                intent.
 
         Returns:
-            ask_sdk_model.response.Response
-                Response for this intent and device.
+            ask_sdk_model.response.Response: Response for this request and
+                device.
         
         """
         # Prevent someone bad from writing a skill that sends requests to this:
@@ -88,25 +116,25 @@ class LaunchRequestHandler(AbstractRequestHandler):
 # Handlers
 # =============================================================================
 class CalendarEventHandler(AbstractRequestHandler):
-    """Object handling all initial requests."""
+    """Object handling CalendarEventIntent."""
     def can_handle(self, handler_input):
-        """Inform the request handler of what intents can be handled."""
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "What is on the calendar", "What events are coming up"
+        
+        """
         return is_intent_name("CalendarEventIntent")(handler_input)
 
     def handle(self, handler_input):
-        """Handle the launch request; fetch and serve appropriate response.
+        """Handle the intent; fetch and serve appropriate response.
         
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
 
-        Raises:
-            ValueError:
-                If something other than the sanctioned app calls this intent.
-
         Returns:
-            ask_sdk_model.response.Response
-                Response for this intent and device.
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
         
         """
         userSession = session.KillianUserSession(handler_input)
@@ -119,25 +147,27 @@ class CalendarEventHandler(AbstractRequestHandler):
         return handler_input.response_builder.response
 
 class ConfessionHandler(AbstractRequestHandler):
-    """Object handling all initial requests."""
+    """Object handling ConfessionIntent."""
     def can_handle(self, handler_input):
-        """Inform the request handler of what intents can be handled."""
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "When is confession", "When is reconciliation"
+        
+        """
         return is_intent_name("ConfessionIntent")(handler_input)
 
     def handle(self, handler_input):
-        """Handle the launch request; fetch and serve appropriate response.
+        """Handle the intent; fetch and serve appropriate response.
+        
+        Ends the current session.
         
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
 
-        Raises:
-            ValueError:
-                If something other than the sanctioned app calls this intent.
-
         Returns:
-            ask_sdk_model.response.Response
-                Response for this intent and device.
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
         
         """
         speech, reprompt, cardTitle, cardText, cardImage = \
@@ -148,11 +178,34 @@ class ConfessionHandler(AbstractRequestHandler):
         return handler_input.response_builder.response
 
 class LatestHomilyHandler(AbstractRequestHandler):
-    """Triggers playback of the latest homily."""
+    """Object responding to initial requests.
+    
+    Triggers playback of the latest homily. Initializes AudioPlayer, ends the
+    session.
+    
+    """
     def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "Play the latest homily", "Play Sunday's homily"
+        
+        """
         return is_intent_name("LatestHomilyIntent")(handler_input)
 
     def handle(self, handler_input):
+        """Handle the intent; fetch and serve appropriate response.
+        
+        Ends the current session with an audio directive.
+        
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Returns:
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
+        
+        """
         userSession = session.KillianUserSession(handler_input)
         homily = audio.Homily(userSession)
         speech, title, text, directive, sessionAttrs = \
@@ -168,25 +221,27 @@ class LatestHomilyHandler(AbstractRequestHandler):
 
 
 class MassTimeHandler(AbstractRequestHandler):
-    """Object handling all initial requests."""
+    """Object handling all initial requests. Handles MassTimeIntent."""
     def can_handle(self, handler_input):
-        """Inform the request handler of what intents can be handled."""
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "What time is church", "When is mass on Wednesday"
+        
+        """
         return is_intent_name("MassTimeIntent")(handler_input)
 
     def handle(self, handler_input):
-        """Handle the launch request; fetch and serve appropriate response.
+        """Handle the intent; fetch and serve appropriate response.
+        
+        Ends the current session.
         
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
 
-        Raises:
-            ValueError:
-                If something other than the sanctioned app calls this intent.
-
         Returns:
-            ask_sdk_model.response.Response
-                Response for this intent and device.
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
         
         """
         userSession = session.KillianUserSession(handler_input)
@@ -195,40 +250,47 @@ class MassTimeHandler(AbstractRequestHandler):
             events.Mass(userSession).getMassTimeResponse()
         handler_input.response_builder.speak(speech).ask(reprompt).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(False)
+        ).set_should_end_session(True)
         return handler_input.response_builder.response
 
 
 class NextMassHandler(AbstractRequestHandler):
-    """Object handling all initial requests."""
+    """Object handling all initial requests. Handles NextMassIntent."""
     def can_handle(self, handler_input):
-        """Inform the request handler of what intents can be handled."""
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "What time is the next mass", "When is mass today"
+        
+        """
         return (is_intent_name("NextMassIntent")(handler_input)
                 and handler_input.request_envelope.request.dialog_state == DialogState.STARTED)
                 #and not handler_input.request_envelope.request.dialog_state == DialogState.COMPLETED)
 
     def handle(self, handler_input):
-        """Handle the launch request; fetch and serve appropriate response.
+        """Handle the intent; fetch and serve appropriate response.
+        
+        If a mass is taking place today, does not end the current session.
+        issues a ElicitSlotDirective to continue the dialog, asking the user
+        if they would like a reminder.
+        
+        If no mass, then ends the current session.
         
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
 
-        Raises:
-            ValueError:
-                If something other than the sanctioned app calls this intent.
-
         Returns:
-            ask_sdk_model.response.Response
-                Response for this intent and device.
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
         
         """
         userSession = session.KillianUserSession(handler_input)
-
+        # Get response:
         envelope = handler_input.request_envelope
         speech, reprompt, cardTitle, cardText, cardImage = \
             events.Mass(userSession).getNextMassResponse()
 
+        # If mass, prompt for a reminder; if not, return response.
         nextMass = events.Mass(userSession).getNextMass()
         if nextMass:
             speech += ". Would you like me to remind you 30 minutes prior to mass?"
@@ -266,10 +328,41 @@ class NextMassHandler(AbstractRequestHandler):
 
 
 class NotifyNextMassHandler(AbstractRequestHandler):
+    """Object handling all initial requests. Handles NotifyNextMassIntent.
+    
+    Also responds as an updated_intent to a reminder prompt from NextMassIntent.
+    
+    """
     def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled.
+        
+        Sample phrases: "Remind me to go to mass"
+        
+        """
         return is_intent_name("NotifyNextMassIntent")(handler_input)
 
     def handle(self, handler_input):
+        """Handle the intent; fetch and serve appropriate response.
+        
+        Handles prompt response if one exists (ie. if this was called as an
+        updated_intent from NextMassIntent). Unless told not to, creates
+        a reminder via the reminder API for 30 minutes prior to mass, handling
+        edge cases such as being within a 30 minute window of next mass OR
+        lack of Reminder permissions by the user.
+        
+        Supports a DEV_MODE for a quick reminder.
+        
+        Ends the current session.
+        
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Returns:
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
+        
+        """
         DEV_MODE = True
         speech = ""
         logging.info("Running NotifyNextMassHandler")
