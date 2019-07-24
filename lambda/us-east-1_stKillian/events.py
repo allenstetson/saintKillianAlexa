@@ -168,7 +168,7 @@ class Mass(object):
         speech = ""
         nextMass = self.getNextMass()
         if not nextMass:
-            logger.info("No more masses today({}), at {}".format(todayNum, nowTime))
+            logger.info("No more masses today.")
             speech += "There are no more masses today. "
             tSpeech, reprompt, _, _, _ = self.getMassTimeResponse(
                 massDay="tomorrow"
