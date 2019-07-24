@@ -1,6 +1,8 @@
 # saintKillianAlexa
 Alexa skill for St. Killian Parish, Mission Viejo, CA
 
+![](./APP_ICON_LARGE.png "St. Killian - Alexa skill")
+
 * [Purpose](#purpose)
 * [Usage](#usage)
 * [Technical Documentation](#technical-documentation)
