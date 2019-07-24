@@ -423,7 +423,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         timezone = pytz.timezone("America/Los_Angeles")
         reminderTime = timezone.localize(reminderTime)
         # Are we within 30 minutes before it starts? If so, apologize and bail.
-        if reminderTime < now:
+        if reminderTime < now and not DEV_MODE:
             logging.info("too late. reminder is in the past.")
             speech = "It looks like it's too late for a reminder. "
             left = int(((reminderTime - now).seconds) / 60)
@@ -994,8 +994,8 @@ def getParishPhoneResponse():
 
 
 def getWelcomeResponse():
-    speech = "Welcome to Saint Killian Parish, Mission Viejo. You can ask "
-    speech += "when is the next Mass."
+    speech = "Welcome to Saint Killian Parish, Mission Viejo."
+    speech += "how may I help you?"
     reprompt = "Try asking: when is the next Mass."
     title = "St. Killian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"
