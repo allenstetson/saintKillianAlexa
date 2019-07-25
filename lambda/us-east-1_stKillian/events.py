@@ -1,10 +1,26 @@
+# ==============================================================================
+# Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
+# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# ==============================================================================
+"""Module containing objects that represent events which take place at times."""
+
+__all__ = ["Calendar", "Confession", "Mass"]
+
+# ==============================================================================
+# Imports
+# ==============================================================================
+# stdlib imports
 import calendar
 import datetime
-import logging
 import pytz
 
+# Amazon imports
+import logging
+
+# local imports
 import killian_data
 
+# Set up logger object and logging level:
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
