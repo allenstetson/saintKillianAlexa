@@ -23,6 +23,9 @@ LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
 
+# ==============================================================================
+# Classes
+# ==============================================================================
 class Calendar:
     """Object for managing calendar events like Oktoberfest, etc.
 
