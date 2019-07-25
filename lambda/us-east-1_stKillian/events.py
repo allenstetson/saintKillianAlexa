@@ -12,35 +12,33 @@ __all__ = ["Calendar", "Confession", "Mass"]
 # stdlib imports
 import calendar
 import datetime
-import pytz
-
-# Amazon imports
 import logging
+import pytz
 
 # local imports
 import killian_data
 
-# Set up logger object and logging level:
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+# Set up LOGGER object and logging level:
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
 
-class Calendar(object):
+class Calendar:
     """Object for managing calendar events like Oktoberfest, etc.
-    
+
     Args:
         userSession (session.KillianUserSession): The current session manager.
-    
+
     """
     def __init__(self, userSession):
         self.userSession = userSession
 
     def getNextEvents(self, numEvents=3):
         """Asks the datamanager for calendar events this month.
-        
+
         If no events are found for the month, this asks for any events coming
         in the next month.
-        
+
         Args:
             numEvents (int): An optional variable that specifies the number of
                 events to fetch. Defaults to 3.
@@ -61,7 +59,7 @@ class Calendar(object):
         items = dataManager.getCalendarEvents()
         if not items:
             items = dataManager.getCalendarEvents(monthOffset=1)
-        logger.info("items found: {}".format(items))
+        LOGGER.info("items found: {}".format(items))
 
         if len(items) > numEvents:
             items = items[:numEvents]
@@ -79,7 +77,6 @@ class Calendar(object):
             eventDate = item[1].strftime("%A, %B %d")
             speech += "{}, ".format(eventDate)
             if "eventTimeEnd" in item[0]:
-                eventStartTime = item[1].strftime("%I:%M %p")
                 eventEndTime = datetime.datetime(
                     item[0]["eventYear"],
                     item[0]["eventMonth"],
@@ -100,14 +97,10 @@ class Calendar(object):
         return speech, reprompt, title, text, cardImage
 
 
-class Confession(object):
+class Confession:
     """Object which forms responses for Confession events."""
-    def getNextConfession(self, numEvents=3):
+    def getNextConfession(self):
         """Forms the response for confession dates and times.
-
-        Args:
-            numEvents (int): An optional variable that specifies the number of
-                events to fetch. Defaults to 3.
 
         Returns:
             str, str, str, str, None
@@ -121,7 +114,7 @@ class Confession(object):
         """
         dataManager = killian_data.KillianDataManager()
         items = dataManager.getConfessions()
-        logger.info("items found: {}".format(items))
+        LOGGER.info("items found: {}".format(items))
 
         speech = "The sacrament of reconciliation will be available, "
 
@@ -143,7 +136,7 @@ class Confession(object):
         return speech, reprompt, title, text, cardImage
 
 
-class Mass(object):
+class Mass:
     """Object that forms responses to queries involving Masses.
 
     Args:
@@ -204,7 +197,9 @@ class Mass(object):
                 # Days of the week run 0-6, if we're at 7, that == 0:
                 if targetDay > 6:
                     targetDay = 0
-                targetDayName = "Tomorrow, {}".format(calendar.day_name[targetDay])
+                targetDayName = "Tomorrow, {}".format(
+                    calendar.day_name[targetDay]
+                )
             else:
                 targetDayName = massDay
                 targetDay = list(calendar.day_name).index(massDay.title())
@@ -228,7 +223,10 @@ class Mass(object):
                 if timeString:
                     timeString += ", "
                 timeString += convertMassToString(massTime, language=language)
-            speech = "{}, the mass times are {}.".format(targetDayName, timeString)
+            speech = "{}, the mass times are {}.".format(
+                targetDayName,
+                timeString
+            )
 
         reprompt = "Try asking: when is the next Mass."
         title = "Mass Times: {}".format(targetDayName)
@@ -237,6 +235,17 @@ class Mass(object):
         return speech, reprompt, title, text, cardImage
 
     def getNextMass(self):
+        """Gets the first mass that takes place today after now.
+
+        This assumes a timezone of America/Los_Angeles (a safe assumption
+        given the location of the parish).
+
+        Returns:
+            dict or None
+            If there are no masses, this returns None; otherwise it returns a
+            the chosen Mass along with the language that it will be given in.
+
+        """
         dataManager = killian_data.KillianDataManager()
         today = datetime.datetime.now(tz=pytz.utc)
         timezone = pytz.timezone("America/Los_Angeles")
@@ -244,13 +253,21 @@ class Mass(object):
         todayNum = todayLocal.weekday()
         times = dataManager.getMassTimes(todayNum)
         if not times:
+            # No Masses take place on this day at all.
             return None
+        # Grab the last mass and compare it to now. If it's after now, then we
+        #  are too late -- we've missed all of the Masses today.
         lastMassTime = times[-1][0]
         nowTime = todayLocal.time()
-        logger.info("Mass today?({}), at {}".format(todayNum, nowTime))
+        LOGGER.info("Mass today?({}), at {}".format(todayNum, nowTime))
         if nowTime > lastMassTime:
-            logger.info("No more masses today({}), at {}".format(todayNum, nowTime))
+            LOGGER.info("No more masses today({}), at {}".format(
+                todayNum, nowTime
+            ))
             return None
+
+        # Iterate through the Masses looking for the first one that is after
+        #  now.
         i = 0
         bestMass = times[i][0]
         while nowTime > bestMass:
@@ -261,17 +278,28 @@ class Mass(object):
         return {"time": bestMass, "language": language}
 
     def getNextMassResponse(self):
+        """Forms a proper response for asking for the next mass today.
+
+        Returns:
+            str, str, str, str, None
+            The speech to speak, the reprompt speech to speak after a timeout,
+            the title to display on a card, the text to display on a card,
+            the cardImage which is None in our case.
+
+        Raises:
+            N/A
+
+        """
         speech = ""
         nextMass = self.getNextMass()
         if not nextMass:
-            logger.info("No more masses today.")
+            LOGGER.info("No more masses today.")
             speech += "There are no more masses today. "
             tSpeech, reprompt, _, _, _ = self.getMassTimeResponse(
                 massDay="tomorrow"
             )
             speech += tSpeech
         else:
-            i = 0
             bestMass = nextMass["time"]
             language = nextMass["language"]
             massString = convertMassToString(bestMass, language=language)
@@ -287,12 +315,23 @@ class Mass(object):
 # Functions
 # =============================================================================
 def convertMassToString(massTime, language="english"):
+    """Formats a mass time into a readable string.
+
+    Most of this can be replaced with strftime formatting for %I and %p.
+    The only real useful part of this is the language handling.
+
+    Args:
+        massTime (datetime.datetime): The datetime of the Mass.
+        language (str): Optional, the language that the mass will be given in.
+        (Defaults to "english")
+
+    """
     hour = massTime.hour
     if hour > 11:
         suffix = "pm"
     else:
         suffix = "am"
-    if not language.lower() == "english":
+    if language.lower() != "english":
         suffix += " in {}".format(language)
     if hour > 12:
         hour = hour - 12
