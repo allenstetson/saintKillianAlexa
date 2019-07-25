@@ -26,10 +26,37 @@ logger.setLevel(logging.INFO)
 
 
 class Calendar(object):
+    """Object for managing calendar events like Oktoberfest, etc.
+    
+    Args:
+        userSession (session.KillianUserSession): The current session manager.
+    
+    """
     def __init__(self, userSession):
         self.userSession = userSession
 
     def getNextEvents(self, numEvents=3):
+        """Asks the datamanager for calendar events this month.
+        
+        If no events are found for the month, this asks for any events coming
+        in the next month.
+        
+        Args:
+            numEvents (int): An optional variable that specifies the number of
+                events to fetch. Defaults to 3.
+
+        Returns:
+            str, str, str, str, None
+            The speech to speak, the reprompt speech to speak after a timeout,
+            the title to display on a card, the text to display on a card,
+            the cardImage which is None in our case.
+
+        Raises:
+            N/A
+
+        """
+
+
         dataManager = killian_data.KillianDataManager()
         items = dataManager.getCalendarEvents()
         if not items:
@@ -74,7 +101,24 @@ class Calendar(object):
 
 
 class Confession(object):
+    """Object which forms responses for Confession events."""
     def getNextConfession(self, numEvents=3):
+        """Forms the response for confession dates and times.
+
+        Args:
+            numEvents (int): An optional variable that specifies the number of
+                events to fetch. Defaults to 3.
+
+        Returns:
+            str, str, str, str, None
+            The speech to speak, the reprompt speech to speak after a timeout,
+            the title to display on a card, the text to display on a card,
+            the cardImage which is None in our case.
+
+        Raises:
+            N/A
+
+        """
         dataManager = killian_data.KillianDataManager()
         items = dataManager.getConfessions()
         logger.info("items found: {}".format(items))
@@ -100,10 +144,41 @@ class Confession(object):
 
 
 class Mass(object):
+    """Object that forms responses to queries involving Masses.
+
+    Args:
+        userSession (session.KillianUserSession): The current session manager.
+
+    """
     def __init__(self, userSession):
         self.userSession = userSession
 
     def getMassTimeResponse(self, massDay=None):
+        """Forms the response for Mass times on a particular day.
+
+        If a day name is not provided, the session is queried for a filled slot
+        (indicating the requested day from the user).  If that isn't provided,
+        then it falls back to using today's day of the week.
+
+        Adjusts time queries (which come back in UTC) to the local timezone
+        which it *assumes* is America/Los_Angeles (a safe assumption given
+        the location of the parish).
+
+        Args:
+            massDay (str): The name of the day to fetch times for.
+                (ex: "Monday") Also supports "Tomorrow" which fetches the next
+                day of the week after today, and "Today".
+
+        Returns:
+            str, str, str, str, None
+            The speech to speak, the reprompt speech to speak after a timeout,
+            the title to display on a card, the text to display on a card,
+            the cardImage which is None in our case.
+
+        Raises:
+            N/A
+
+        """
         targetDay = None
         if not massDay:
             massDay = self.userSession.massDay
@@ -126,6 +201,7 @@ class Mass(object):
                 targetDayName = "Today"
             elif massDay.lower() == "tomorrow":
                 targetDay = today + 1
+                # Days of the week run 0-6, if we're at 7, that == 0:
                 if targetDay > 6:
                     targetDay = 0
                 targetDayName = "Tomorrow, {}".format(calendar.day_name[targetDay])
@@ -133,22 +209,26 @@ class Mass(object):
                 targetDayName = massDay
                 targetDay = list(calendar.day_name).index(massDay.title())
         else:
+            # No mass day provided. Just use today.
             todayUtc = datetime.datetime.now(tz=pytz.utc)
             timezone = pytz.timezone("America/Los_Angeles")
             todayLocal = todayUtc.astimezone(timezone)
             targetDay = todayLocal.weekday()
             targetDayName = "Today"
 
+        # Grab the times from the database:
         times = dataManager.getMassTimes(targetDay)
 
-        timeString = ""
-        #for massTime, language in times:
-        for massTime, language in times:
-            if timeString:
-                timeString += ", "
-            timeString += convertMassToString(massTime, language=language)
-
-        speech = "{}, the mass times are {}.".format(targetDayName, timeString)
+        if not times:
+            speech = "There are no masses on {}. ".format(targetDayName)
+        else:
+            timeString = ""
+            #for massTime, language in times:
+            for massTime, language in times:
+                if timeString:
+                    timeString += ", "
+                timeString += convertMassToString(massTime, language=language)
+            speech = "{}, the mass times are {}.".format(targetDayName, timeString)
 
         reprompt = "Try asking: when is the next Mass."
         title = "Mass Times: {}".format(targetDayName)
