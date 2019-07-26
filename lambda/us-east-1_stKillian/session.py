@@ -1,6 +1,25 @@
+# ==============================================================================
+# Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
+# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# ==============================================================================
+"""Module containing helper object that tracks user session, id, attrs."""
+
+__all__ = ["KillianUserSession"]
+
+# ==============================================================================
+# Imports
+# ==============================================================================
+# local imports
 import killian_data
 
 class KillianUserSession(object):
+    """Object for tracking & accessing user data, session data, working with DB.
+    
+    Args:
+        handler_input (ask_sdk_core.handler_input.HandlerInput):
+            Input from Alexa.
+
+    """
     def __init__(self, handler_input):
         self._dataMan = killian_data.KillianDataManager()
         self._dbEntry = {}
@@ -13,6 +32,7 @@ class KillianUserSession(object):
 
     @property
     def dbEntry(self):
+        """The database entry/record for this session in its entirety."""
         if self._dbEntry:
             return self._dbEntry
         self._dbEntry = self._dataMan.getUserDatabaseEntry(self.userId)
@@ -20,10 +40,12 @@ class KillianUserSession(object):
 
     @property
     def desiresReminder(self):
+        """Slot indicating whether the user has asked for a reminder."""
         return self.slots.get("DESIRES_REMINDER", {}).get("value")
 
     @property
     def lastToken(self):
+        """Persistent attr for tracking the last AudioPlayer token."""
         return self.dbEntry.get("lastToken", "")
 
     @lastToken.setter
@@ -32,6 +54,7 @@ class KillianUserSession(object):
 
     @property
     def lastTrack(self):
+        """Persistent attr for tracking the last AudioPlayer track."""
         return self.dbEntry.get("lastTrack", "")
 
     @lastTrack.setter
@@ -40,10 +63,12 @@ class KillianUserSession(object):
 
     @property
     def massDay(self):
+        """Slot for which day the user is interested in mass times."""
         return self.slots.get("massDay", {}).get("value")
 
     @property
     def offsetInMilliseconds(self):
+        """Persistent attr for the last known AudioPlayer offset."""
         return self._dbEntry.get("offsetInMilliseconds", 0)
 
     @offsetInMilliseconds.setter
@@ -52,6 +77,7 @@ class KillianUserSession(object):
 
     @property
     def userId(self):
+        """The current user's Amazon ID (pulled from session context)."""
         if self._userId:
             return self._userId
         env = self._handler_input.request_envelope
@@ -59,6 +85,11 @@ class KillianUserSession(object):
         return self._userId
 
     def populateAttrs(self):
+        """Pulls data from the session and database to fill all session attrs.
+        
+        This includes Slots, Persistent Attributes, and User ID.
+        
+        """
         print("populating attrs")
         self._sessionAttributes = \
             self._handler_input.attributes_manager.request_attributes
@@ -92,8 +123,9 @@ class KillianUserSession(object):
         self.slots = slots
 
     def populateDbEntry(self):
+        """Fetches data from the user's database record into memory."""
         self._dbEntry = self._dataMan.getUserDatabaseEntry(self.userId)
 
     def savePersistentAttrs(self):
+        """Writes data in memory to the user's database record."""
         self._dataMan.updateUserDatabaseEntry(self.userId, self.dbEntry)
-
