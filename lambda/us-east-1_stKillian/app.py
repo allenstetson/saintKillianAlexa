@@ -994,8 +994,8 @@ def getParishPhoneResponse():
 
 
 def getWelcomeResponse():
-    speech = "Welcome to Saint Killian Parish, Mission Viejo."
-    speech += "how may I help you?"
+    speech = "Welcome to Saint Killian Parish, Mission Viejo. "
+    speech += "How may I be of service?"
     reprompt = "Try asking: when is the next Mass."
     title = "St. Killian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"
