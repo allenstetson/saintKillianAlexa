@@ -139,12 +139,27 @@ class CalendarEventHandler(AbstractRequestHandler):
         """
         userSession = session.KillianUserSession(handler_input)
 
-        speech, reprompt, cardTitle, cardText, cardImage = \
-            events.Calendar(userSession).getNextEvents()
-        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
-            StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(True)
+        implemented = False
+        if implemented:
+            speech, reprompt, cardTitle, cardText, cardImage = \
+                events.Calendar(userSession).getNextEvents()
+            handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+                StandardCard(title=cardTitle, text=cardText, image=cardImage)
+            ).set_should_end_session(True)
+            return handler_input.response_builder.response
+        
+        calendar = events.Calendar(userSession)
+        speech, title, text, directive, sessionAttrs = \
+            calendar.getNotImplementedResponse()
+
+        card = StandardCard(title=title, text=text)
+        handler_input.response_builder.speak(speech)
+        handler_input.response_builder.set_card(card)
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        handler_input.attributes_manager.session_attributes = sessionAttrs
         return handler_input.response_builder.response
+
 
 class ConfessionHandler(AbstractRequestHandler):
     """Object handling ConfessionIntent."""
@@ -246,8 +261,9 @@ class MassTimeHandler(AbstractRequestHandler):
         """
         userSession = session.KillianUserSession(handler_input)
 
+        mass = events.Mass(userSession)
         speech, reprompt, cardTitle, cardText, cardImage = \
-            events.Mass(userSession).getMassTimeResponse()
+            mass.getMassTimeResponse()
         handler_input.response_builder.speak(speech).ask(reprompt).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
         ).set_should_end_session(True)
@@ -321,9 +337,9 @@ class NextMassHandler(AbstractRequestHandler):
 
         # No next mass, so ... no reminder needed:
         handler_input.response_builder.speak(speech).set_card(
-            StandardCard(title=cardTitle, text=cardText)
+            StandardCard(title=cardTitle, text=cardText, image=cardImage)
         )
-        handler_input.response_builder.should_end_session(True)
+        handler_input.response_builder.set_should_end_session(True)
         return handler_input.response_builder.response
 
 
@@ -994,8 +1010,11 @@ def getParishPhoneResponse():
 
 
 def getWelcomeResponse():
-    speech = "Welcome to Saint Killian Parish, Mission Viejo. "
+    #speech = "Welcome to Saint Killian Parish, Mission Viejo. "
+    speech = "<speak>"
+    speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '
     speech += "How may I be of service?"
+    speech += "</speak>"
     reprompt = "Try asking: when is the next Mass."
     title = "St. Killian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"

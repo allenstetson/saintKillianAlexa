@@ -13,7 +13,16 @@ __all__ = ["Calendar", "Confession", "Mass"]
 import calendar
 import datetime
 import logging
+import random
+
+# external imports
 import pytz
+
+# amazon imports
+from ask_sdk_model.interfaces.audioplayer import (
+    PlayDirective, PlayBehavior, AudioItem, Stream, AudioItemMetadata,
+    StopDirective, AudioPlayerState)
+from ask_sdk_model.ui.image import Image
 
 # local imports
 import killian_data
@@ -35,6 +44,59 @@ class Calendar:
     """
     def __init__(self, userSession):
         self.userSession = userSession
+
+    def getNotImplementedResponse(self):
+        """Plays an audio announcement that this feature is forthcoming.
+
+        Until a shared calendar is in place, I cannot look up calendar events.
+        So that the user knows that this feature is coming, this plays a nice
+        song with a happy announcer telling the user that the feature is on
+        its way.
+
+        Args:
+            N/A
+
+        Raises:
+            N/A
+
+        Returns:
+            str, str, str, ask_sdk_model.interfaces.audioplayer.PlayDirective, dict
+            The speech for Alexa to speak,
+            the title to display on the card,
+            the text to display on the card,
+            the play directive telling Alexa what audio file to play,
+            session attributes to be passed to Alexa.
+
+        """
+        url = "https://st-killian-resources.s3.amazonaws.com/calendarGeneric_mixdown.mp3"
+        token = "calendarGeneric_mixdown"
+        speech = ""
+        title = "St. Killian calendar events"
+        text = "Calendar events coming soon! Watch the bulletin for news."
+        self.userSession.lastToken = token
+        self.userSession.lastTrack = url
+        self.userSession.savePersistentAttrs()
+
+        sessionAttrs = {
+            "lastTrack": url,
+            "lastToken": token
+        }
+        directive = PlayDirective(
+            play_behavior=PlayBehavior.REPLACE_ALL,
+            audio_item=AudioItem(
+                stream=Stream(
+                    expected_previous_token=None,
+                    token=token,
+                    url=url,
+                    offset_in_milliseconds=0
+                ),
+                metadata=AudioItemMetadata(
+                    title="Calendar Events",
+                    subtitle=text
+                )
+            )
+        )
+        return speech, title, text, directive, sessionAttrs
 
     def getNextEvents(self, numEvents=3):
         """Asks the datamanager for calendar events this month.
@@ -99,6 +161,7 @@ class Calendar:
         cardImage = None
         return speech, reprompt, title, text, cardImage
 
+# =============================================================================
 
 class Confession:
     """Object which forms responses for Confession events."""
@@ -138,6 +201,90 @@ class Confession:
         cardImage = None
         return speech, reprompt, title, text, cardImage
 
+# =============================================================================
+
+class HolyDays:
+    """Holy day names and enums, used for checking mass times."""
+    index = {
+        100: ["solemnity of mary"],
+        101: ["solemnity of the epiphany of the lord", "epiphany of the lord",
+              "epiphany", "feast of the epiphany"],
+        102: ["baptism of the lord"],
+        103: ["ash wednesday"],
+        104: ["solemnity of saint joeseph", "feast of saint joeseph"],
+        105: ["solemnity of the annunciation of the lord", "annunciation",
+              "annunciation of the lord", "feast of the annunciation"],
+        106: ["palm sunday"],
+        107: ["holy thursday"],
+        108: ["good friday"],
+        109: ["holy saturday"],
+        110: ["easter", "easter sunday"],
+        111: ["divine mercy sunday"],
+        112: ["ascension of the lord", "ascension"],
+        113: ["pentecost", "pentecost sunday"],
+        114: ["solemnity of the most holy trinity", "holy trinity",
+              "solemnity of the holy trinity", "feast of the holy trinity"],
+        115: ["solemnity of the most holy body and blood of christ",
+              "corpus christi", "solemnity of the body and blood of christ",
+              "solemnity of the body and blood", "feast of corpus christi",
+              "feast of the body and blood"],
+        116: ["solemnity of the nativity of saint john the baptist",
+              "solemnity of the nativity of john the baptist",
+              "solemnity of saint john the baptist",
+              "solemnity of john the baptist", "feast of john the baptist"],
+        117: ["solemnity of the most sacred heart of jesus",
+              "solemnity of the sacred heart", "feast of the sacred heart",
+              "sacred heart of jesus", "sacred heart"],
+        118: ["solemnity of saints peter and paul", "feast of saint peter",
+              "solemnity of peter and paul", "feast of saint paul",
+              "feast of the apostles", "solemnity of the apostles"],
+        119: ["solemnity of the assumption of the blessed virgin mary",
+              "solemnity of the assumption of mary", "feast of the assumption",
+              "solemnity of the assumption", "assumption of mary",
+              "assumption of the virgin mary", "assumption of the virgin",
+              "assumption"],
+        120: ["all saints day"],
+        121: ["all souls day", "commemoration of all the faithful departed",
+              "commemoration of all of the faithfully departed"],
+        122: ["solemnity of our lord jesus christ king of the universe",
+              "feast of christ the king", "solemnity of christ the king",
+              "solemnity of our lord jesus", "solemnity of jesus christ",
+              "solemnity of our lord jesus christ", "solemnity of christ",
+              "solemnity of jesus"],
+        123: ["solemnity of the immaculate conception of the blessed virgin mary",
+              "solemnity of the immaculate conception", "immaculate conception",
+              "feast of the immaculate conception",
+              "feast of the immaculate conception of mary",
+              "feast of the immaculate conception of the virgin mary"],
+        124: ["christmas", "nativity of the lord", "christmas day",
+              "christmas eve"]
+    }
+
+    def isHolyDay(self, inputWords):
+        """Checks to see if the words spoken correspond to a holy day."""
+        match = [x for x in self.index if inputWords.lower() in self.index[x]]
+        if match:
+            return True
+        return False
+
+    def getHolyDayEnumByName(self, name):
+        """Given a holy day name, fetch the corresponding enum value."""
+        match = [x for x in self.index if name.lower() in self.index[x]]
+        if not match:
+            return None
+        return match[0]
+
+    def getHolyDayNameByEnum(self, enum):
+        """Given a number, match that with a holy day name."""
+        if not enum in self.index:
+            return None
+        name = self.index[enum][0]
+        if name.startswith("solemnity") or name.startswith("ascension") or \
+                name.startswith("baptism"):
+            name = "the " + name
+        return name
+
+# =============================================================================
 
 class Mass:
     """Object that forms responses to queries involving Masses.
@@ -181,31 +328,16 @@ class Mass:
         dataManager = killian_data.KillianDataManager()
 
         if massDay:
-            if massDay.endswith("'s"):
-                # In case Alexa hears "Friday's mass times"
-                massDay = massDay[:-2]
-            elif massDay.endswith("s"):
-                # In case Alexa hears "Fridays mass times"
-                massDay = massDay[:-1]
-            todayUtc = datetime.datetime.now(tz=pytz.utc)
-            timezone = pytz.timezone("America/Los_Angeles")
-            todayLocal = todayUtc.astimezone(timezone)
-            today = todayLocal.weekday()
-            todayName = calendar.day_name[today]
-            if massDay.title() in [todayName, "Today"]:
-                targetDay = today
-                targetDayName = "Today"
-            elif massDay.lower() == "tomorrow":
-                targetDay = today + 1
-                # Days of the week run 0-6, if we're at 7, that == 0:
-                if targetDay > 6:
-                    targetDay = 0
-                targetDayName = "Tomorrow, {}".format(
-                    calendar.day_name[targetDay]
-                )
-            else:
-                targetDayName = massDay
-                targetDay = list(calendar.day_name).index(massDay.title())
+            targetDay, targetDayName = self.resolveMassDay(massDay)
+            if not targetDay:
+                speech = "I'm not sure that I understood your question. "
+                speech += "Can you ask again? "
+                timeString = "Try asking again..."
+                targetDayName = "Unsure"
+                reprompt = "Try asking again. "
+                title = "I must have misheard you."
+                text = "Please ask again."
+                return speech, reprompt, title, text, None
         else:
             # No mass day provided. Just use today.
             todayUtc = datetime.datetime.now(tz=pytz.utc)
@@ -215,21 +347,32 @@ class Mass:
             targetDayName = "Today"
 
         # Grab the times from the database:
-        times = dataManager.getMassTimes(targetDay)
+        if targetDay >= 100:
+            times = dataManager.getHolyDayMassTimesByEnum(targetDay)
+        else:
+            times = dataManager.getMassTimesByEnum(targetDay)
 
         if not times:
-            speech = "There are no masses on {}. ".format(targetDayName)
+            speech = "Masses have not yet been defined for {}. "
+            speech += "Please check back later for more information. "
+            speech = speech.format(targetDayName)
+            timeString = "No masses yet defined."
         else:
             timeString = ""
-            #for massTime, language in times:
             for massTime, language in times:
                 if timeString:
                     timeString += ", "
                 timeString += convertMassToString(massTime, language=language)
-            speech = "{}, the mass times are {}.".format(
+            speeches = []
+            speeches.append("{}, the mass times are {}.".format(
                 targetDayName,
                 timeString
-            )
+            ))
+            speeches.append("The mass times for {} are {}.".format(
+                targetDayName,
+                timeString
+            ))
+            speech = random.choice(speeches)
 
         reprompt = "Try asking: when is the next Mass."
         title = "Mass Times: {}".format(targetDayName)
@@ -254,7 +397,7 @@ class Mass:
         timezone = pytz.timezone("America/Los_Angeles")
         todayLocal = today.astimezone(timezone)
         todayNum = todayLocal.weekday()
-        times = dataManager.getMassTimes(todayNum)
+        times = dataManager.getMassTimesByEnum(todayNum)
         if not times:
             # No Masses take place on this day at all.
             return None
@@ -310,8 +453,53 @@ class Mass:
             reprompt = "What else can I do for you?"
         title = "Next Mass"
         text = speech
-        cardImage = None
+        cardImage = Image(
+            small_image_url="https://st-killian-resources.s3.amazonaws.com/kilian-celtic-logo-card_720x480.jpg",
+            large_image_url="https://st-killian-resources.s3.amazonaws.com/kilian-celtic-logo-card_720x480.jpg"
+        )
+
         return speech, reprompt, title, text, cardImage
+
+    def resolveMassDay(self, massDay):
+        """Resolve user speech into a desired mass day"""
+        # First check for a holy day:
+        holyDays = HolyDays()
+        if holyDays.isHolyDay(massDay):
+            LOGGER.info("Holy day detected: {}".format(massDay))
+            targetDay = holyDays.getHolyDayEnumByName(massDay)
+            targetDayName = holyDays.getHolyDayNameByEnum(targetDay)
+            return targetDay, targetDayName
+
+        # Next, assume it's a day of the week, homogenize:
+        if massDay.endswith("'s"):
+            # In case Alexa hears "Friday's mass times"
+            massDay = massDay[:-2]
+        elif massDay.endswith("s"):
+            # In case Alexa hears "Fridays mass times"
+            massDay = massDay[:-1]
+        todayUtc = datetime.datetime.now(tz=pytz.utc)
+        timezone = pytz.timezone("America/Los_Angeles")
+        todayLocal = todayUtc.astimezone(timezone)
+        today = todayLocal.weekday()
+        todayName = calendar.day_name[today]
+        if massDay.title() in [todayName, "Today"]:
+            targetDay = today
+            targetDayName = "Today"
+        elif massDay.lower() == "tomorrow":
+            targetDay = today + 1
+            # Days of the week run 0-6, if we're at 7, that == 0:
+            if targetDay > 6:
+                targetDay = 0
+            targetDayName = "Tomorrow, {}".format(
+                calendar.day_name[targetDay]
+            )
+        else:
+            targetDayName = massDay
+            try:
+                targetDay = list(calendar.day_name).index(massDay.title())
+            except ValueError:
+                return None, None
+        return targetDay, targetDayName
 
 
 # =============================================================================

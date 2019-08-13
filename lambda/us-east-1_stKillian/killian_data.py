@@ -171,7 +171,90 @@ class KillianDataManager(object):
         found = sorted(found, key=lambda x: x[1])
         return found
 
-    def getMassTimes(self, dayEnum):
+    def getHolyDayMassTimesByEnum(self, dayEnum):
+        """Gets mass times for a specific day of the week.
+
+        Args:
+            dayEnum (int): The number representing the day of the week for
+                which we want mass times.
+
+        Returns:
+            [(datetime.time, str)]
+            List of tuples containing the time that the mass takes place
+                along with the name of the language that the Mass will be
+                given in.
+
+        """
+        msg = "Attempting to retrieve holy day mass times for {} from db"
+        msg = msg.format(dayEnum)
+        LOGGER.info(msg)
+
+        # Assemble the primary key for quick DB retrieval
+        namespace = "event:mass:holyday:{}".format(dayEnum)
+
+        # Query the database
+        item = None
+        try:
+            response = self.dbTable.get_item(
+                TableName="StKillian",
+                Key={'namespace': namespace}
+            )
+            # If the item is not found:
+            if not 'Item' in response:
+                return None
+
+            # Store the item
+            item = response['Item']
+        # If the database query raises an error:
+        except ClientError as e:
+            LOGGER.info("get_item for mass times failed.")
+            LOGGER.error(e.response['Error']['Message'])
+            return None
+
+        # Good, we found the event. Find times, format them for return
+        if item.get("eventTimes"):
+            times = list()
+            for massString in item['eventTimes']:
+                if len(massString.split(",")) == 2:
+                    hourNum, minNum = massString.split(",")
+                    language = "english"
+                else:
+                    hourNum, minNum, language = massString.split(",")
+
+                times.append((datetime.time(int(hourNum), int(minNum)), language))
+            # Sort them based on the time and return
+            times = sorted(times, key=lambda x: x[0].hour)
+            return times
+
+        # A holy day, it may not have times associated.
+        #  If this is the case, we'll need to fall back on the day
+        #  of the week on which it falls.
+        #  If this is not defined, we'll need to report that these
+        #  times have not yet been defined.
+
+        # Get datetime. Use my birthday as a default since I'm so old
+        year = item.get("eventYear", 1976)
+        month = item.get("eventMonth", 11)
+        day = item.get("eventDay", 15)
+        eventDate = datetime.date(year, month, day)
+
+        todayUtc = datetime.datetime.now(tz=pytz.utc)
+        timezone = pytz.timezone("America/Los_Angeles")
+        todayLocal = todayUtc.astimezone(timezone)
+
+        if eventDate < todayLocal.date():
+            # This item is in the past
+            #  This means that we can't rely on its date information.
+            #  We're essentially flying blind here, and the best that we can do
+            #  is to report that this holy day hasn't been set up yet.
+            return None
+
+        # This event has a date, but not mass times. Just return the times for
+        #  that day.
+        dayEnum = eventDate.weekday()
+        return self.getMassTimesByEnum(dayEnum)
+
+    def getMassTimesByEnum(self, dayEnum):
         """Gets mass times for a specific day of the week.
 
         Args:
