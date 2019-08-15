@@ -4,7 +4,7 @@
 # ==============================================================================
 """Module containing objects that represent events which take place at times."""
 
-__all__ = ["Calendar", "Confession", "Mass"]
+__all__ = ["Calendar", "Confession", "MassDay", "MassResponse"]
 
 # ==============================================================================
 # Imports
@@ -286,7 +286,105 @@ class HolyDays:
 
 # =============================================================================
 
-class Mass:
+class MassDay:
+    """Object representing a day on which mass is held."""
+    def __init__(self, dayName):
+        self._holyDay = None
+        self._title = None
+        self.date = None
+        self.dayEnum = None
+        self.dayName = None
+
+        self.dataManager = killian_data.KillianDataManager()
+        self.daySpoken = dayName
+        self.resolveDayFromName(dayName)
+
+    @property
+    def holyDay(self):
+        if self._holyDay is not None:  # Allow the return of {} which is valid.
+            return self._holyDay
+        if self.date:
+            self._holyDay = self.dataManager.getHolyDayByDate(self.date)
+        elif self.dayEnum >= 100:
+            self._holyDay = self.dataManager.getHolyDayByEnum(self.dayEnum)
+        else:
+            self._holyDay = {}
+        return self._holyDay
+
+    @property
+    def massTimes(self):
+        enum = self.dayEnum
+        # FIXME: If the enum is 100+, we need to derive dayOfWeek from date
+        massTimes = self.dataManager.getMassTimesByEnum(enum)
+        allMassTimes = massTimes
+
+        if self.holyDay:
+            mode = self.holyDay.get("massMode", "supplement")
+            enum = self.holyDay["dayEnum"]
+            massTimes = self.dataManager.getHolyDayMassTimesByEnum(enum)
+            if mode == "supplement":
+                allMassTimes.extend(massTimes)
+            elif mode == "replace":
+                allMassTimes = massTimes
+        return allMassTimes
+
+    @property
+    def title(self):
+        if self.holyDay:
+            return self.holyDay["eventTitle"]
+        return self.dayName
+
+    def resolveDayFromName(self, dayName):
+        """Resolve user speech into a desired mass day"""
+        # First check for a holy day:
+        holyDays = HolyDays()
+        if holyDays.isHolyDay(dayName):
+            LOGGER.info("Holy day detected: {}".format(dayName))
+            self.dayEnum = holyDays.getHolyDayEnumByName(dayName)
+            self.dayName = holyDays.getHolyDayNameByEnum(self.dayEnum)
+            # FIXME: Need to derive a date here -- it is used on line #317
+            return
+
+        # Next, assume it's a day of the week, homogenize:
+        if dayName.endswith("'s"):
+            # In case Alexa hears "Friday's mass times"
+            dayName = dayName[:-2]
+        elif dayName.endswith("s"):
+            # In case Alexa hears "Fridays mass times"
+            dayName = dayName[:-1]
+        todayUtc = datetime.datetime.now(tz=pytz.utc)
+        timezone = pytz.timezone("America/Los_Angeles")
+        todayLocal = todayUtc.astimezone(timezone)
+        today = todayLocal.weekday()
+        todayName = todayLocal.strftime("%A")
+        if dayName.title() in [todayName, "Today"]:
+            self.dayEnum = today
+            self.dayName = "Today"
+            self.date = todayLocal.date()
+        elif dayName.lower() == "tomorrow":
+            self.date = todayLocal.date() + datetime.timedelta(days=1)
+            self.dayEnum = self.date.weekday()
+            self.dayName = "Tomorrow, {}".format(
+                self.date.strftime("%A")
+            )
+        else:
+            self.dayName = dayName.title()
+            try:
+                self.dayEnum = list(calendar.day_name).index(self.dayName)
+                diff = self.dayEnum - today
+                if diff < 0:
+                    diff = diff + 7
+                self.date = todayLocal.date() + \
+                    datetime.timedelta(days=diff)
+            except ValueError:
+                # Default to today
+                self.date = todayLocal.date()
+                self.dayEnum = self.date.weekday()
+
+
+# =============================================================================
+
+class MassResponse:
     """Object that forms responses to queries involving Masses.
 
     Args:
@@ -328,29 +426,14 @@ class Mass:
         dataManager = killian_data.KillianDataManager()
 
         if massDay:
-            targetDay, targetDayName = self.resolveMassDay(massDay)
-            if not targetDay:
-                speech = "I'm not sure that I understood your question. "
-                speech += "Can you ask again? "
-                timeString = "Try asking again..."
-                targetDayName = "Unsure"
-                reprompt = "Try asking again. "
-                title = "I must have misheard you."
-                text = "Please ask again."
-                return speech, reprompt, title, text, None
+            massDayObj = MassDay(massDay)
         else:
             # No mass day provided. Just use today.
-            todayUtc = datetime.datetime.now(tz=pytz.utc)
-            timezone = pytz.timezone("America/Los_Angeles")
-            todayLocal = todayUtc.astimezone(timezone)
-            targetDay = todayLocal.weekday()
-            targetDayName = "Today"
+            massDayObj = MassDay("Today")
 
         # Grab the times from the database:
-        if targetDay >= 100:
-            times = dataManager.getHolyDayMassTimesByEnum(targetDay)
-        else:
-            times = dataManager.getMassTimesByEnum(targetDay)
+        times = massDayObj.massTimes
+        targetDayName = massDayObj.title
 
         if not times:
             speech = "Masses have not yet been defined for {}. "
@@ -459,48 +542,6 @@ class Mass:
         )
 
         return speech, reprompt, title, text, cardImage
-
-    def resolveMassDay(self, massDay):
-        """Resolve user speech into a desired mass day"""
-        # First check for a holy day:
-        holyDays = HolyDays()
-        if holyDays.isHolyDay(massDay):
-            LOGGER.info("Holy day detected: {}".format(massDay))
-            targetDay = holyDays.getHolyDayEnumByName(massDay)
-            targetDayName = holyDays.getHolyDayNameByEnum(targetDay)
-            return targetDay, targetDayName
-
-        # Next, assume it's a day of the week, homogenize:
-        if massDay.endswith("'s"):
-            # In case Alexa hears "Friday's mass times"
-            massDay = massDay[:-2]
-        elif massDay.endswith("s"):
-            # In case Alexa hears "Fridays mass times"
-            massDay = massDay[:-1]
-        todayUtc = datetime.datetime.now(tz=pytz.utc)
-        timezone = pytz.timezone("America/Los_Angeles")
-        todayLocal = todayUtc.astimezone(timezone)
-        today = todayLocal.weekday()
-        todayName = calendar.day_name[today]
-        if massDay.title() in [todayName, "Today"]:
-            targetDay = today
-            targetDayName = "Today"
-        elif massDay.lower() == "tomorrow":
-            targetDay = today + 1
-            # Days of the week run 0-6, if we're at 7, that == 0:
-            if targetDay > 6:
-                targetDay = 0
-            targetDayName = "Tomorrow, {}".format(
-                calendar.day_name[targetDay]
-            )
-        else:
-            targetDayName = massDay
-            try:
-                targetDay = list(calendar.day_name).index(massDay.title())
-            except ValueError:
-                return None, None
-        return targetDay, targetDayName
-
 
 # =============================================================================
 # Functions

@@ -119,15 +119,15 @@ class CalendarEventHandler(AbstractRequestHandler):
     """Object handling CalendarEventIntent."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         Sample phrases: "What is on the calendar", "What events are coming up"
-        
+
         """
         return is_intent_name("CalendarEventIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the intent; fetch and serve appropriate response.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -135,7 +135,7 @@ class CalendarEventHandler(AbstractRequestHandler):
         Returns:
             ask_sdk_model.response.Response: Response for this intent and
                 device.
-        
+
         """
         userSession = session.KillianUserSession(handler_input)
 
@@ -147,7 +147,7 @@ class CalendarEventHandler(AbstractRequestHandler):
                 StandardCard(title=cardTitle, text=cardText, image=cardImage)
             ).set_should_end_session(True)
             return handler_input.response_builder.response
-        
+
         calendar = events.Calendar(userSession)
         speech, title, text, directive, sessionAttrs = \
             calendar.getNotImplementedResponse()
@@ -165,17 +165,17 @@ class ConfessionHandler(AbstractRequestHandler):
     """Object handling ConfessionIntent."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         Sample phrases: "When is confession", "When is reconciliation"
-        
+
         """
         return is_intent_name("ConfessionIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the intent; fetch and serve appropriate response.
-        
+
         Ends the current session.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -183,7 +183,7 @@ class ConfessionHandler(AbstractRequestHandler):
         Returns:
             ask_sdk_model.response.Response: Response for this intent and
                 device.
-        
+
         """
         speech, reprompt, cardTitle, cardText, cardImage = \
             events.Confession().getNextConfession()
@@ -194,24 +194,24 @@ class ConfessionHandler(AbstractRequestHandler):
 
 class LatestHomilyHandler(AbstractRequestHandler):
     """Object responding to initial requests.
-    
+
     Triggers playback of the latest homily. Initializes AudioPlayer, ends the
     session.
-    
+
     """
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         Sample phrases: "Play the latest homily", "Play Sunday's homily"
-        
+
         """
         return is_intent_name("LatestHomilyIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the intent; fetch and serve appropriate response.
-        
+
         Ends the current session with an audio directive.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -219,7 +219,7 @@ class LatestHomilyHandler(AbstractRequestHandler):
         Returns:
             ask_sdk_model.response.Response: Response for this intent and
                 device.
-        
+
         """
         userSession = session.KillianUserSession(handler_input)
         homily = audio.Homily(userSession)
@@ -239,17 +239,17 @@ class MassTimeHandler(AbstractRequestHandler):
     """Object handling all initial requests. Handles MassTimeIntent."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         Sample phrases: "What time is church", "When is mass on Wednesday"
-        
+
         """
         return is_intent_name("MassTimeIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the intent; fetch and serve appropriate response.
-        
+
         Ends the current session.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -257,16 +257,59 @@ class MassTimeHandler(AbstractRequestHandler):
         Returns:
             ask_sdk_model.response.Response: Response for this intent and
                 device.
-        
+
         """
         userSession = session.KillianUserSession(handler_input)
 
-        mass = events.Mass(userSession)
+        mass = events.MassResponse(userSession)
         speech, reprompt, cardTitle, cardText, cardImage = \
             mass.getMassTimeResponse()
-        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
-            StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(True)
+        handler_input.response_builder.speak(speech).ask(reprompt)
+        #handler_input.response_builder.set_card(
+        #    StandardCard(title=cardTitle, text=cardText, image=cardImage)
+        #)
+        handler_input.response_builder.set_should_end_session(False)  # ALLEN
+        #return handler_input.response_builder.response
+
+        # Display Directive:
+        from ask_sdk_model.interfaces.display.render_template_directive import RenderTemplateDirective
+        from ask_sdk_model.interfaces.display.body_template2 import BodyTemplate2
+        from ask_sdk_model.interfaces.display.text_content import TextContent
+        #from ask_sdk_model.ui.image import Image
+        from ask_sdk_model.interfaces.display.image import Image as DisplayImage
+        from ask_sdk_model.interfaces.display.image_instance import ImageInstance
+        from ask_sdk_model.interfaces.display.plain_text import PlainText
+        from ask_sdk_model.interfaces.display.rich_text import RichText
+        mainImageInstance = ImageInstance(
+            url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/altarCU.jpg",
+            #size=ask_sdk_model.interfaces.display.image_size.ImageSize(),
+            #width_pixels=int,
+            #height_pixels=int
+        )
+        mainImage = DisplayImage(
+            content_description="Close up of altar",
+            sources = [mainImageInstance]
+        )
+        backgroundImageInstance = ImageInstance(
+            url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/churchInterior.jpg",
+        )
+        backgroundImage = DisplayImage(
+            content_description="church interior",
+            sources = [backgroundImageInstance]
+        )
+        textContent = TextContent(
+            primary_text=PlainText(text="I am primary text."),
+            secondary_text=PlainText(text="secondary text"),
+            tertiary_text=PlainText(text="tertiary text")
+        )
+        bodyTemplate = BodyTemplate2(
+            background_image=backgroundImage,
+            image=mainImage,
+            title="I am a title.",
+            text_content=textContent
+        )
+        displayDirective = RenderTemplateDirective(template=bodyTemplate)
+        handler_input.response_builder.add_directive(displayDirective)
         return handler_input.response_builder.response
 
 
@@ -304,10 +347,10 @@ class NextMassHandler(AbstractRequestHandler):
         # Get response:
         envelope = handler_input.request_envelope
         speech, reprompt, cardTitle, cardText, cardImage = \
-            events.Mass(userSession).getNextMassResponse()
+            events.MassResponse(userSession).getNextMassResponse()
 
         # If mass, prompt for a reminder; if not, return response.
-        nextMass = events.Mass(userSession).getNextMass()
+        nextMass = events.MassResponse(userSession).getNextMass()
         if nextMass:
             speech += ". Would you like me to remind you 30 minutes prior to mass?"
             handler_input.response_builder.speak(speech).ask(reprompt).set_card(
@@ -423,7 +466,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         # Else, let's set up the reminder
         logging.info("Necessary permissions found. Creating reminder.")
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
-        massTime = events.Mass(userSession).getNextMass()
+        massTime = events.MassResponse(userSession).getNextMass()
         # If no more masses today:
         if not massTime:
             logging.info("no next mass found for today")
@@ -586,20 +629,20 @@ class AudioNextIntentHandler(AbstractRequestHandler):
     """Handles AudioPlayer request NextIntent."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         Sample Phrases: "Next", "Skip"
-        
+
         """
         return is_intent_name("AMAZON.NextIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the request.
-        
+
         Since this skill doesn't support a stream of audio files, this simply
         returns a no-op response.
-        
+
         Ends session as is required by the AudioPlayer.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -613,17 +656,17 @@ class AudioPlaybackFinishedHandler(AbstractRequestHandler):
     """Handles AudioPlayer request PlaybackFinished."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         This request is sent by the AudioPlayer when playback finishes.
-                
+
         """
         return is_request_type("AudioPlayer.PlaybackFinished")(handler_input)
 
     def handle(self, handler_input):
         """Handle the request.
-        
+
         Since we needn't take any action, this returns a no-op.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
@@ -809,22 +852,22 @@ class AudioStartOverIntentHandler(AbstractRequestHandler):
     """Handles AudioPlayer intent StartOverIntent."""
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled.
-        
+
         This request is sent by the AudioPlayer when a user asks for
         a track to start over.
-                
+
         """
         return is_intent_name("AMAZON.StartOverIntent")(handler_input)
 
     def handle(self, handler_input):
         """Handle the request.
-        
+
         We need to know the track that was playing last. We can give it
         an offset of zero, ensuring that it plays from the beginning as
         requested. We then need to build and deliver the directive.
-        
+
         Ends session as is required by the AudioPlayer.
-        
+
         Args:
             handler_input (ask_sdk_core.handler_input.HandlerInput):
                 Input from Alexa.
