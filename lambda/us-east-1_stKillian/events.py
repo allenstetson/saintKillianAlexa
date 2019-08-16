@@ -440,12 +440,18 @@ class MassResponse:
             speech += "Please check back later for more information. "
             speech = speech.format(targetDayName)
             timeString = "No masses yet defined."
+            displayText = timeString
         else:
             timeString = ""
+            displayText = ""
             for massTime, language in times:
                 if timeString:
                     timeString += ", "
-                timeString += convertMassToString(massTime, language=language)
+                if displayText:
+                    displayText += "<br/>"
+                result = convertMassToString(massTime, language=language)
+                timeString += result
+                displayText += result
             speeches = []
             speeches.append("{}, the mass times are {}.".format(
                 targetDayName,
@@ -461,7 +467,7 @@ class MassResponse:
         title = "Mass Times: {}".format(targetDayName)
         text = "{} mass times:\n{}".format(targetDayName, timeString)
         cardImage = None
-        return speech, reprompt, title, text, cardImage
+        return speech, reprompt, title, text, cardImage, displayText
 
     def getNextMass(self):
         """Gets the first mass that takes place today after now.

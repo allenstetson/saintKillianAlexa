@@ -305,6 +305,7 @@ class KillianDataManager(object):
             return None
 
         # Good, we found the event. Find times, format them for return
+        #FIXME: Must check for valid holy day times first!:
         if item.get("eventTimes"):
             times = list()
             for massString in item['eventTimes']:
