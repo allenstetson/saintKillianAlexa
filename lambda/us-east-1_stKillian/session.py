@@ -64,6 +64,9 @@ class KillianUserSession(object):
     @property
     def massDay(self):
         """Slot for which day the user is interested in mass times."""
+        if self.slots.get("massDay", {}).get("values"):
+            vals = self.slots["massDay"]["values"][0]["value"]["name"]
+            return " ".join(vals)
         return self.slots.get("massDay", {}).get("value")
 
     @property

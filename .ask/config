@@ -23,7 +23,7 @@
             "codeUri": "lambda/us-east-1_stKillian",
             "functionName": "stKillian",
             "handler": "app.handler",
-            "revisionId": "cfc40aad-9f09-4ed1-91c3-26f595f1a57b",
+            "revisionId": "6b3354c3-7263-478a-8f21-237aa8ab056a",
             "runtime": "python3.7"
           }
         ]
