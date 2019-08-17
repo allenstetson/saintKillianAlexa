@@ -286,7 +286,6 @@ class MassTimeHandler(AbstractRequestHandler):
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
         )
         handler_input.response_builder.set_should_end_session(True)
-        #handler_input.response_builder.set_should_end_session(False)
 
         # Display Directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(

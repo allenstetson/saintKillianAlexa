@@ -229,10 +229,8 @@ class KillianDataManager(object):
                 which we want mass times.
 
         Returns:
-            [(datetime.time, str)]
-            List of tuples containing the time that the mass takes place
-                along with the name of the language that the Mass will be
-                given in.
+            dict
+                Database entry for the requested holy day.
 
         """
         msg = "Attempting to retrieve holy day mass times for {} from db"
@@ -261,7 +259,7 @@ class KillianDataManager(object):
             LOGGER.error(e.response['Error']['Message'])
             return None
 
-        # Good, we found the event. Find times, format them for return
+        # Good, we found the event. Return it.
         return item
 
     def getHolyDayMassTimesByEnum(self, dayEnum):

@@ -314,7 +314,9 @@ class MassDay:
     @property
     def massTimes(self):
         enum = self.dayEnum
-        # FIXME: If the enum is 100+, we need to derive dayOfWeek from date
+        if enum >= 100:
+            # Holy day! Not a valid weekday enum; find the day it occurs:
+            enum = self.date.weekday()
         massTimes = self.dataManager.getMassTimesByEnum(enum)
         allMassTimes = massTimes
 
@@ -323,15 +325,38 @@ class MassDay:
             enum = self.holyDay["dayEnum"]
             massTimes = self.dataManager.getHolyDayMassTimesByEnum(enum)
             if mode == "supplement":
-                allMassTimes.extend(massTimes)
+                # Don't double report
+                if allMassTimes and not allMassTimes == massTimes:
+                    allMassTimes.extend(massTimes)
             elif mode == "replace":
                 allMassTimes = massTimes
         return allMassTimes
 
     @property
     def title(self):
+        """The spoken title of this Mass Day."""
+        print("deriving title")
         if self.holyDay:
-            return self.holyDay["eventTitle"]
+            print("title: it's a holy day")
+            # For holy days, we have a few choices.
+            #  If it takes place this week, we want: "Sunday, Christmas"
+            #  If it takes place in the future, we want:
+            #  "Sunday December 24th, Christmas"
+            today = datetime.date.today()
+            delta = abs(self.date - today).days
+            print("title: delta {}".format(delta))
+            if delta > 7:
+                sDate = self.date.strftime("%A %B %d")
+            elif delta == 0:
+                sDate = "Today"
+            else:
+                sDate = self.date.strftime("%A")
+            hDay = self.holyDay["eventTitle"].title()
+            title = "{}, {}".format(sDate, hDay)
+            print("Returning title: {}".format(title))
+            return title
+        # For a normal day, we just want "Sunday" or "Today"
+        print("Returning title: {}".format(self.dayName))
         return self.dayName
 
     def resolveDayFromName(self, dayName):
@@ -342,7 +367,12 @@ class MassDay:
             LOGGER.info("Holy day detected: {}".format(dayName))
             self.dayEnum = holyDays.getHolyDayEnumByName(dayName)
             self.dayName = holyDays.getHolyDayNameByEnum(self.dayEnum)
-            # FIXME: Need to derive a date here -- it is used on line #317
+            hDay = self.dataManager.getHolyDayByEnum(self.dayEnum)
+            self._holyDay = hDay
+            year = hDay.get("eventYear", 1976)
+            month = hDay.get("eventMonth", 11)
+            day = hDay.get("eventDay", 15)
+            self.date = datetime.date(year, month, day)
             return
 
         # Next, assume it's a day of the week, homogenize:
