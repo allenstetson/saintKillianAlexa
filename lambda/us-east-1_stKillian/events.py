@@ -183,23 +183,30 @@ class Confession:
         LOGGER.info("items found: {}".format(items))
 
         speech = "The sacrament of reconciliation will be available, "
+        displayText = ""
 
         for item in items:
             speech += item[0]["dayName"] + ", "
+            displayText += "<u>{}</u><br/>".format(item[0]["dayName"])
             for timeStr in item[0]["eventTimes"]:
                 cTime = datetime.time(
                     int(timeStr.split(",")[0]),
                     int(timeStr.split(",")[1])
                 )
                 speech += cTime.strftime("%I:%M %p")
+                displayText += "{}<br/>".format(cTime.strftime("%-I:%M %p"))
                 speech += ", "
+            displayText += "<br/>"
 
         speech += "."
         reprompt = "What else can I help you with? "
         title = "Confession"
         text = speech
-        cardImage = None
-        return speech, reprompt, title, text, cardImage
+        cardImage = Image(
+            small_image_url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
+            large_image_url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
+        )
+        return speech, reprompt, title, text, cardImage, displayText
 
 # =============================================================================
 
@@ -496,7 +503,10 @@ class MassResponse:
         reprompt = "Try asking: when is the next Mass."
         title = "Mass Times: {}".format(targetDayName)
         text = "{} mass times:\n{}".format(targetDayName, timeString)
-        cardImage = None
+        cardImage = Image(
+            small_image_url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
+            large_image_url="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
+        )
         return speech, reprompt, title, text, cardImage, displayText
 
     def getNextMass(self):

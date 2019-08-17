@@ -200,11 +200,26 @@ class ConfessionHandler(AbstractRequestHandler):
                 device.
 
         """
-        speech, reprompt, cardTitle, cardText, cardImage = \
+        speech, reprompt, cardTitle, cardText, cardImage, displayText = \
             events.Confession().getNextConfession()
-        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+        handler_input.response_builder.speak(speech).ask(reprompt)
+        
+        # Card for app:
+        handler_input.response_builder.set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(True)
+        )
+        handler_input.response_builder.set_should_end_session(True)
+
+        # Display directive for display devices (Echo Show, etc):
+        directiveBuilder = display.Directive(
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            title=cardTitle,
+            text=displayText
+        )
+        displayDirective = directiveBuilder.getDirective()
+        handler_input.response_builder.add_directive(displayDirective)
+
         return handler_input.response_builder.response
 
 class LatestHomilyHandler(AbstractRequestHandler):
