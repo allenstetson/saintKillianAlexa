@@ -570,15 +570,17 @@ class MassResponse:
         if not nextMass:
             LOGGER.info("No more masses today.")
             speech += "There are no more masses today. "
-            tSpeech, reprompt, _, _, _ = self.getMassTimeResponse(
+            tSpeech, reprompt, _, _, _, _ = self.getMassTimeResponse(
                 massDay="tomorrow"
             )
             speech += tSpeech
+            displayText = speech
         else:
             bestMass = nextMass["time"]
             language = nextMass["language"]
             massString = convertMassToString(bestMass, language=language)
             speech = "The next mass today will be at {}".format(massString)
+            displayText = massString
             reprompt = "What else can I do for you?"
         title = "Next Mass"
         text = speech
@@ -587,7 +589,7 @@ class MassResponse:
             large_image_url="https://st-killian-resources.s3.amazonaws.com/kilian-celtic-logo-card_720x480.jpg"
         )
 
-        return speech, reprompt, title, text, cardImage
+        return speech, reprompt, title, text, cardImage, displayText
 
 # =============================================================================
 # Functions

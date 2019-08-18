@@ -347,7 +347,7 @@ class NextMassHandler(AbstractRequestHandler):
         userSession = session.KillianUserSession(handler_input)
         # Get response:
         envelope = handler_input.request_envelope
-        speech, reprompt, cardTitle, cardText, cardImage = \
+        speech, reprompt, cardTitle, cardText, cardImage, displayText = \
             events.MassResponse(userSession).getNextMassResponse()
 
         # If mass, prompt for a reminder; if not, return response.
@@ -383,6 +383,13 @@ class NextMassHandler(AbstractRequestHandler):
         # No next mass, so ... no reminder needed:
         handler_input.response_builder.speak(speech).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
+        )
+        # Display Directive for display devices (Echo Show, etc):
+        directiveBuilder = display.Directive(
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            title=cardTitle,
+            text=displayText
         )
         handler_input.response_builder.set_should_end_session(True)
         return handler_input.response_builder.response
