@@ -200,11 +200,26 @@ class ConfessionHandler(AbstractRequestHandler):
                 device.
 
         """
-        speech, reprompt, cardTitle, cardText, cardImage = \
+        speech, reprompt, cardTitle, cardText, cardImage, displayText = \
             events.Confession().getNextConfession()
-        handler_input.response_builder.speak(speech).ask(reprompt).set_card(
+        handler_input.response_builder.speak(speech).ask(reprompt)
+        
+        # Card for app:
+        handler_input.response_builder.set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
-        ).set_should_end_session(True)
+        )
+        handler_input.response_builder.set_should_end_session(True)
+
+        # Display directive for display devices (Echo Show, etc):
+        directiveBuilder = display.Directive(
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            title=cardTitle,
+            text=displayText
+        )
+        displayDirective = directiveBuilder.getDirective()
+        handler_input.response_builder.add_directive(displayDirective)
+
         return handler_input.response_builder.response
 
 class LatestHomilyHandler(AbstractRequestHandler):
@@ -332,7 +347,7 @@ class NextMassHandler(AbstractRequestHandler):
         userSession = session.KillianUserSession(handler_input)
         # Get response:
         envelope = handler_input.request_envelope
-        speech, reprompt, cardTitle, cardText, cardImage = \
+        speech, reprompt, cardTitle, cardText, cardImage, displayText = \
             events.MassResponse(userSession).getNextMassResponse()
 
         # If mass, prompt for a reminder; if not, return response.
@@ -368,6 +383,13 @@ class NextMassHandler(AbstractRequestHandler):
         # No next mass, so ... no reminder needed:
         handler_input.response_builder.speak(speech).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
+        )
+        # Display Directive for display devices (Echo Show, etc):
+        directiveBuilder = display.Directive(
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            title=cardTitle,
+            text=displayText
         )
         handler_input.response_builder.set_should_end_session(True)
         return handler_input.response_builder.response
@@ -458,7 +480,8 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         if not massTime:
             logging.info("no next mass found for today")
             speech = "Sorry, but it looks like there are no more masses today."
-            card = SimpleCard("St. Killian", "Reminder set for Mass.")
+            cardText = "No more masses today.\nTry again tomorrow."
+            card = SimpleCard("St. Killian - Mass Reminder", cardText)
             return responseBuilder.speak(speech).set_card(card) \
                 .set_should_end_session(True).response
 
@@ -474,7 +497,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             speech = "It looks like it's too late for a reminder. "
             left = int(((reminderTime - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
-            card = SimpleCard("St. Killian", "Reminder set for Mass.")
+            card = SimpleCard("St. Killian - Mass Reminder", "Reminder set for Mass.")
             return responseBuilder.speak(speech).set_card(card) \
                 .set_should_end_session(True).response
 
@@ -583,6 +606,7 @@ class CancelAndStopIntentHandler(AbstractRequestHandler):
         responseBuilder.set_should_end_session(True)
         return handler_input.response_builder.response
 
+
 class FallbackIntentHandler(AbstractRequestHandler):
     """Handler for fallback intent.
 
@@ -606,6 +630,37 @@ class FallbackIntentHandler(AbstractRequestHandler):
         speech = "Sorry, I'm not sure how to help you with that. "
         speech += "You can try asking when is the next Mass."
         reprompt = "I didn't catch that. What can I help you with?"
+        return handler_input.response_builder.speak(speech).ask(
+            reprompt).response
+
+
+class HelpIntentHandler(AbstractRequestHandler):
+    """Handler for help intent.
+
+    When the user asks for help, this is the response.
+
+    """
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled."""
+        return is_intent_name("AMAZON.HelpIntent")(handler_input)
+
+    def handle(self, handler_input):
+        """Handle the request; fetch and serve appropriate response.
+
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        """
+        LOGGER.info("In HelpIntentHandler")
+        speech = "Saint Killian can help you with the following requests. "
+        speech += "What time is mass? When is mass on Sunday? "
+        speech += "When is the next mass? Remind me to go to mass. "
+        speech += "When is confession? "
+        speech += "What is the parish office phone number? "
+        speech += "Now, how may I help you?"
+        reprompt = "I didn't catch that. What can I help you with?"
+        handler_input.response_builder.set_should_end_session(False)
         return handler_input.response_builder.speak(speech).ask(
             reprompt).response
 
@@ -1073,6 +1128,7 @@ sb.add_request_handler(CalendarEventHandler())
 sb.add_request_handler(ConfessionHandler())
 sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
+sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(LatestHomilyHandler())
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(MassTimeHandler())
