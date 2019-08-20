@@ -23,6 +23,8 @@ from botocore.exceptions import ClientError
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
+__all__ = ["KillianDataManager"]
+
 # ==============================================================================
 # Classes
 # ==============================================================================

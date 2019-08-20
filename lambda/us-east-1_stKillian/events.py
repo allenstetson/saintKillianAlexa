@@ -334,7 +334,8 @@ class MassDay:
             if mode == "supplement":
                 # Don't double report
                 if allMassTimes and not allMassTimes == massTimes:
-                    allMassTimes.extend(massTimes)
+                    if massTimes:
+                        allMassTimes.extend(massTimes)
             elif mode == "replace":
                 allMassTimes = massTimes
         return allMassTimes
