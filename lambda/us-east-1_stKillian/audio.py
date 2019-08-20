@@ -1,22 +1,36 @@
+###############################################################################
+# Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
+# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+###############################################################################
+"""Module for serving audio directives for appropriate requests."""
+
+# ASK imports
 from ask_sdk_model.interfaces.audioplayer import (
     PlayDirective, PlayBehavior, AudioItem, Stream, AudioItemMetadata,
     StopDirective, AudioPlayerState)
 
+# Local imports
 import killian_data
 import session
 
 
-class Homily(object):
+__all__ = ["Homily"]
+
+
+class Homily:
+    """Object representing recorded homilies to be played by request."""
     def __init__(self, userSession):
         self.userSession = userSession
 
     def getLatestHomily(self):
+        """Determine the latest recorded homily & return a directive for it."""
         #homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"
         homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/killianGeneric_mixdown.mp3"
         #token = "06-17-19_TheChristianLifeIsLikeAJob"
         token = "killianGeneric_mixdown"
 
-        #speech = "Okay. Here is a homily from Sunday, June seventeenth by Father Dwyer. "
+        #speech = "Okay. Here is a homily from Sunday, "
+        #speech += "June seventeenth by Father Dwyer. "
         #title = "Latest Homily"
         #text = "June 17, 2019 Father Dwyer"
         speech = ""
@@ -48,4 +62,3 @@ class Homily(object):
             )
         )
         return speech, title, text, directive, sessionAttrs
-

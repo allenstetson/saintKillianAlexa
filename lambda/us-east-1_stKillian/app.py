@@ -203,7 +203,7 @@ class ConfessionHandler(AbstractRequestHandler):
         speech, reprompt, cardTitle, cardText, cardImage, displayText = \
             events.Confession().getNextConfession()
         handler_input.response_builder.speak(speech).ask(reprompt)
-        
+
         # Card for app:
         handler_input.response_builder.set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
@@ -497,7 +497,10 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             speech = "It looks like it's too late for a reminder. "
             left = int(((reminderTime - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
-            card = SimpleCard("St. Killian - Mass Reminder", "Reminder set for Mass.")
+            card = SimpleCard(
+                "St. Killian - Mass Reminder",
+                "Reminder set for Mass."
+            )
             return responseBuilder.speak(speech).set_card(card) \
                 .set_should_end_session(True).response
 

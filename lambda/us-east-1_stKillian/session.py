@@ -12,9 +12,9 @@ __all__ = ["KillianUserSession"]
 # local imports
 import killian_data
 
-class KillianUserSession(object):
+class KillianUserSession:
     """Object for tracking & accessing user data, session data, working with DB.
-    
+
     Args:
         handler_input (ask_sdk_core.handler_input.HandlerInput):
             Input from Alexa.
@@ -23,11 +23,12 @@ class KillianUserSession(object):
     def __init__(self, handler_input):
         self._dataMan = killian_data.KillianDataManager()
         self._dbEntry = {}
-        self._handler_input = handler_input
+        self._handlerInput = handler_input
+        self._sessionAttributes = {}
         self._userId = None
         self.slots = {}
 
-        self._sessionAttributes = self.populateAttrs()
+        self.populateAttrs()
         self.populateDbEntry()
 
     @property
@@ -83,27 +84,27 @@ class KillianUserSession(object):
         """The current user's Amazon ID (pulled from session context)."""
         if self._userId:
             return self._userId
-        env = self._handler_input.request_envelope
+        env = self._handlerInput.request_envelope
         self._userId = env.context.system.user.user_id
         return self._userId
 
     def populateAttrs(self):
         """Pulls data from the session and database to fill all session attrs.
-        
+
         This includes Slots, Persistent Attributes, and User ID.
-        
+
         """
         print("populating attrs")
         self._sessionAttributes = \
-            self._handler_input.attributes_manager.request_attributes
+            self._handlerInput.attributes_manager.request_attributes
         self._sessionAttributes["userId"] = \
-            self._handler_input.request_envelope.context.system.user.user_id
+            self._handlerInput.request_envelope.context.system.user.user_id
 
         # If this is a request such as PlaybackStopped, it won't have an intent
-        if not hasattr(self._handler_input.request_envelope.request, "intent"):
+        if not hasattr(self._handlerInput.request_envelope.request, "intent"):
             return
 
-        filledSlots = self._handler_input.request_envelope.request.intent.slots
+        filledSlots = self._handlerInput.request_envelope.request.intent.slots
         print("Filled slots: {} ({})".format(filledSlots, type(filledSlots)))
         if not filledSlots:
             return

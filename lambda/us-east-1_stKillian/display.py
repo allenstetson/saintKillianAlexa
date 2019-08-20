@@ -17,6 +17,18 @@ from ask_sdk_model.interfaces.display.plain_text import PlainText
 from ask_sdk_model.interfaces.display.rich_text import RichText
 
 class Directive:
+    """Display Directive generator for Saint Killian.
+
+    Args:
+        mainUrl (str): The URL to the main, smaller, image to display.
+
+        backgroundUrl (str): The URL to the image to display in the BG.
+
+        title (str): The title to display ("Saint Killian -" will be added)
+
+        text (str): The body of the text; richText supported.
+
+    """
     def __init__(self, mainUrl=None, backgroundUrl=None, title=None, text=None):
         self.mainUrl = mainUrl
         self.backgroundUrl = backgroundUrl
@@ -24,6 +36,13 @@ class Directive:
         self.text = text
 
     def getDirective(self):
+        """Get the display directive, assembled from object init args.
+
+        Returns:
+            RenderTemplateDirective: The directive to serve with the
+              response_handler.
+
+       """
         mainImageInstance = ImageInstance(
             url=self.mainUrl
             #size=ask_sdk_model.interfaces.display.image_size.ImageSize(),
@@ -32,14 +51,14 @@ class Directive:
         )
         mainImage = DisplayImage(
             content_description="Main image",
-            sources = [mainImageInstance]
+            sources=[mainImageInstance]
         )
         backgroundImageInstance = ImageInstance(
             url=self.backgroundUrl
         )
         backgroundImage = DisplayImage(
             content_description="Background image",
-            sources = [backgroundImageInstance]
+            sources=[backgroundImageInstance]
         )
         textContent = TextContent(
             primary_text=RichText(text=self.text),

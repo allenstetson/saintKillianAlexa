@@ -308,6 +308,12 @@ class MassDay:
 
     @property
     def holyDay(self):
+        """Get the holy day database entry associated with this mass day.
+
+        Returns:
+            dict: The database entry with data for this holy day.
+
+        """
         if self._holyDay is not None:  # Allow the return of {} which is valid.
             return self._holyDay
         if self.date:
@@ -320,6 +326,13 @@ class MassDay:
 
     @property
     def massTimes(self):
+        """Get the mass times for this mass day.
+
+        Returns:
+            [(str, str)]: The list of mass times and languages for all masses
+              being held on this mass day.
+
+        """
         enum = self.dayEnum
         if enum >= 100:
             # Holy day! Not a valid weekday enum; find the day it occurs:
@@ -458,10 +471,8 @@ class MassResponse:
             N/A
 
         """
-        targetDay = None
         if not massDay:
             massDay = self.userSession.massDay
-        dataManager = killian_data.KillianDataManager()
 
         if massDay:
             massDayObj = MassDay(massDay)

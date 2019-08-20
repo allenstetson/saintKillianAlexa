@@ -28,7 +28,7 @@ __all__ = ["KillianDataManager"]
 # ==============================================================================
 # Classes
 # ==============================================================================
-class KillianDataManager(object):
+class KillianDataManager:
     """Data broker that writes and reads data to/from database.
 
     Uses dynamodb as the main database, in the us-east-1 region, table name:
@@ -305,7 +305,6 @@ class KillianDataManager(object):
             return None
 
         # Good, we found the event. Find times, format them for return
-        #FIXME: Must check for valid holy day times first!:
         if item.get("eventTimes"):
             times = list()
             for massString in item['eventTimes']:
@@ -315,7 +314,10 @@ class KillianDataManager(object):
                 else:
                     hourNum, minNum, language = massString.split(",")
 
-                times.append((datetime.time(int(hourNum), int(minNum)), language))
+                times.append((
+                    datetime.time(int(hourNum), int(minNum)),
+                    language
+                ))
             # Sort them based on the time and return
             times = sorted(times, key=lambda x: x[0].hour)
             return times
