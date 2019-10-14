@@ -78,7 +78,9 @@ from ask_sdk_model.ui import (
     SimpleCard,
     StandardCard
 )
-
+from ask_sdk_core.dispatch_components.exception_components import(
+    AbstractExceptionHandler
+)
 # Local imports
 import audio
 import display
@@ -218,7 +220,15 @@ class ConfessionHandler(AbstractRequestHandler):
             text=displayText
         )
         displayDirective = directiveBuilder.getDirective()
-        handler_input.response_builder.add_directive(displayDirective)
+
+        # Check for displayDirective support:
+        envelope = handler_input.request_envelope
+        supported = envelope.context.system.device.supported_interfaces.to_dict()
+        if 'display' in supported:
+            LOGGER.info("display interface supported, adding display directive.")
+            handler_input.response_builder.add_directive(displayDirective)
+        else:
+            LOGGER.info("display interface not supported, withholding directive.")
 
         return handler_input.response_builder.response
 
@@ -310,7 +320,16 @@ class MassTimeHandler(AbstractRequestHandler):
             text=displayText
         )
         displayDirective = directiveBuilder.getDirective()
-        handler_input.response_builder.add_directive(displayDirective)
+
+        # Check for displayDirective support:
+        envelope = handler_input.request_envelope
+        supported = envelope.context.system.device.supported_interfaces.to_dict()
+        if 'display' in supported:
+            LOGGER.info("display interface supported, adding display directive.")
+            handler_input.response_builder.add_directive(displayDirective)
+        else:
+            LOGGER.info("display interface not supported, withholding directive.")
+
         return handler_input.response_builder.response
 
 
@@ -608,6 +627,34 @@ class CancelAndStopIntentHandler(AbstractRequestHandler):
         #responseBuilder.add_directive(directive)
         responseBuilder.set_should_end_session(True)
         return handler_input.response_builder.response
+
+
+class ExceptionHandler(AbstractExceptionHandler):
+    """Handler for fatal errors.
+
+    If an exception is raised in the code, this response takes over.
+
+    """
+    def can_handle(self, handler_input, exception):
+        """Handle everything."""
+        return True
+
+    def handle(self, handler_input, exception):
+        """Handle the request; fetch and serve appropriate response.
+
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        """
+        LOGGER.info("In ExceptionHandler")
+        LOGGER.error("EXCEPTION!: {}".format(exception))
+        speech = "Sorry, I've encountered an error in my code. "
+        speech += "If this problem persists, "
+        speech += "please inform the Saint Killian parish office."
+        reprompt = "I didn't catch that. What can I help you with?"
+        return handler_input.response_builder.speak(speech).ask(
+            reprompt).response
 
 
 class FallbackIntentHandler(AbstractRequestHandler):
@@ -1139,6 +1186,8 @@ sb.add_request_handler(NextMassHandler())
 sb.add_request_handler(NotifyNextMassHandler())
 sb.add_request_handler(ParishPhoneHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
+
+sb.add_exception_handler(ExceptionHandler())
 
 sb.add_global_request_interceptor(RequestLogger())
 sb.add_global_response_interceptor(ResponseLogger())
