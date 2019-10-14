@@ -224,7 +224,7 @@ class ConfessionHandler(AbstractRequestHandler):
         # Check for displayDirective support:
         envelope = handler_input.request_envelope
         supported = envelope.context.system.device.supported_interfaces.to_dict()
-        if 'display' in supported:
+        if supported.get('display'):
             LOGGER.info("display interface supported, adding display directive.")
             handler_input.response_builder.add_directive(displayDirective)
         else:
@@ -324,7 +324,7 @@ class MassTimeHandler(AbstractRequestHandler):
         # Check for displayDirective support:
         envelope = handler_input.request_envelope
         supported = envelope.context.system.device.supported_interfaces.to_dict()
-        if 'display' in supported:
+        if supported.get('display'):
             LOGGER.info("display interface supported, adding display directive.")
             handler_input.response_builder.add_directive(displayDirective)
         else:
@@ -410,6 +410,17 @@ class NextMassHandler(AbstractRequestHandler):
             title=cardTitle,
             text=displayText
         )
+        displayDirective = directiveBuilder.getDirective()
+
+        # Check for displayDirective support:
+        envelope = handler_input.request_envelope
+        supported = envelope.context.system.device.supported_interfaces.to_dict()
+        if supported.get('display'):
+            LOGGER.info("display interface supported, adding display directive.")
+            handler_input.response_builder.add_directive(displayDirective)
+        else:
+            LOGGER.info("display interface not supported, withholding directive.")
+
         handler_input.response_builder.set_should_end_session(True)
         return handler_input.response_builder.response
 
