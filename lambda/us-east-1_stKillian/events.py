@@ -471,8 +471,12 @@ class MassResponse:
             N/A
 
         """
+        LOGGER.info("in getMassTimeResponse")
         if not massDay:
             massDay = self.userSession.massDay
+            msg = "No massDay specified; getting from session: {}"
+            msg = msg.format(massDay)
+            LOGGER.info(msg)
 
         if massDay:
             massDayObj = MassDay(massDay)
@@ -577,6 +581,7 @@ class MassResponse:
             N/A
 
         """
+        LOGGER.info("Getting next mass response...")
         speech = ""
         nextMass = self.getNextMass()
         if not nextMass:
