@@ -521,11 +521,12 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         reminderTime = todayEvent - datetime.timedelta(minutes=30)
         timezone = pytz.timezone("America/Los_Angeles")
         reminderTime = timezone.localize(reminderTime)
+        todayEvent = timezone.localize(todayEvent)
         # Are we within 30 minutes before it starts? If so, apologize and bail.
         if reminderTime < now and not DEV_MODE:
             logging.info("too late. reminder is in the past.")
             speech = "It looks like it's too late for a reminder. "
-            left = int(((reminderTime - now).seconds) / 60)
+            left = int(((todayEvent - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
             card = SimpleCard(
                 "St. Killian - Mass Reminder",
