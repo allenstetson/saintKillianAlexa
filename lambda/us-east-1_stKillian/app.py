@@ -299,6 +299,7 @@ class MassTimeHandler(AbstractRequestHandler):
                 device.
 
         """
+        LOGGER.info("__In MassTimeHandler__")
         userSession = session.KillianUserSession(handler_input)
 
         mass = events.MassResponse(userSession)
@@ -363,6 +364,7 @@ class NextMassHandler(AbstractRequestHandler):
                 device.
 
         """
+        LOGGER.info("In NextMassHandler")
         userSession = session.KillianUserSession(handler_input)
         # Get response:
         envelope = handler_input.request_envelope
@@ -463,7 +465,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         """
         DEV_MODE = False
         speech = ""
-        logging.info("Running NotifyNextMassHandler")
+        LOGGER.info("Running NotifyNextMassHandler")
         userSession = session.KillianUserSession(handler_input)
 
         negativeResponses = ["nah", "nope", "no thank you", "no thanks", "no"]
@@ -495,7 +497,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
 
         # If no permissions
         if not (permissions and permissions.consent_token):
-            logging.info("user hasn't granted reminder permission")
+            LOGGER.info("user hasn't granted reminder permission")
             speech = "Please give Saint Killian permissions to set reminders"
             speech += " using your Alexa app."
             permissions = ["alexa::alerts:reminders:skill:readwrite"]
@@ -503,12 +505,12 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             return responseBuilder.speak(speech).set_card(card).response
 
         # Else, let's set up the reminder
-        logging.info("Necessary permissions found. Creating reminder.")
+        LOGGER.info("Necessary permissions found. Creating reminder.")
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
         massTime = events.MassResponse(userSession).getNextMass()
         # If no more masses today:
         if not massTime:
-            logging.info("no next mass found for today")
+            LOGGER.info("no next mass found for today")
             speech = "Sorry, but it looks like there are no more masses today."
             cardText = "No more masses today.\nTry again tomorrow."
             card = SimpleCard("St. Killian - Mass Reminder", cardText)
@@ -524,7 +526,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         todayEvent = timezone.localize(todayEvent)
         # Are we within 30 minutes before it starts? If so, apologize and bail.
         if reminderTime < now and not DEV_MODE:
-            logging.info("too late. reminder is in the past.")
+            LOGGER.info("too late. reminder is in the past.")
             speech = "It looks like it's too late for a reminder. "
             left = int(((todayEvent - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
