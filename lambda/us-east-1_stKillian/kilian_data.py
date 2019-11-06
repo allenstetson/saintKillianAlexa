@@ -1,10 +1,10 @@
 # ==============================================================================
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 # ==============================================================================
 """Module with data manager which interacts with a database upon request."""
 
-__all__ = ["KillianDataManager"]
+__all__ = ["KilianDataManager"]
 
 # ==============================================================================
 # Imports
@@ -23,16 +23,16 @@ from botocore.exceptions import ClientError
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
-__all__ = ["KillianDataManager"]
+__all__ = ["KilianDataManager"]
 
 # ==============================================================================
 # Classes
 # ==============================================================================
-class KillianDataManager:
+class KilianDataManager:
     """Data broker that writes and reads data to/from database.
 
     Uses dynamodb as the main database, in the us-east-1 region, table name:
-    StKillian
+    StKilian
 
     """
     def __init__(self):
@@ -41,7 +41,7 @@ class KillianDataManager:
             region_name="us-east-1",
             endpoint_url="http://dynamodb.us-east-1.amazonaws.com"
         )
-        self.dbTable = self.dynamodb.Table("StKillian")
+        self.dbTable = self.dynamodb.Table("StKilian")
 
     def getCalendarEvents(self, monthOffset=0):
         """Gets upcoming calendar events for this month.
@@ -246,7 +246,7 @@ class KillianDataManager:
         item = None
         try:
             response = self.dbTable.get_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={'namespace': namespace}
             )
             # If the item is not found:
@@ -289,7 +289,7 @@ class KillianDataManager:
         item = None
         try:
             response = self.dbTable.get_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={'namespace': namespace}
             )
             # If the item is not found:
@@ -375,7 +375,7 @@ class KillianDataManager:
         item = None
         try:
             response = self.dbTable.get_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={'namespace': namespace}
             )
             # If the item is not found:
@@ -421,7 +421,7 @@ class KillianDataManager:
         item = None
         try:
             response = self.dbTable.get_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={'namespace': namespace}
             )
             # If no item found:
@@ -460,7 +460,7 @@ class KillianDataManager:
         item = None
         try:
             response = self.dbTable.get_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={'namespace': userId}
             )
             # If no record found, this is a new user; return empty dict:
@@ -502,7 +502,7 @@ class KillianDataManager:
         # Update the database
         try:
             self.dbTable.update_item(
-                TableName="StKillian",
+                TableName="StKilian",
                 Key={"namespace": userId},
                 UpdateExpression=updateExpression,
                 ExpressionAttributeValues={

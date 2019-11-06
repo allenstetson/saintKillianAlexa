@@ -1,6 +1,6 @@
 ###############################################################################
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 ###############################################################################
 """Module for serving audio directives for appropriate requests."""
 
@@ -10,7 +10,7 @@ from ask_sdk_model.interfaces.audioplayer import (
     StopDirective, AudioPlayerState)
 
 # Local imports
-import killian_data
+import kilian_data
 import session
 
 
@@ -27,15 +27,15 @@ class Homily:
         #homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"
         homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/killianGeneric_mixdown.mp3"
         #token = "06-17-19_TheChristianLifeIsLikeAJob"
-        token = "killianGeneric_mixdown"
+        token = "kilianGeneric_mixdown"
 
         #speech = "Okay. Here is a homily from Sunday, "
         #speech += "June seventeenth by Father Dwyer. "
         #title = "Latest Homily"
         #text = "June 17, 2019 Father Dwyer"
         speech = ""
-        title = "St. Killian audio"
-        text = "St. Killian audio coming soon!"
+        title = "St. Kilian audio"
+        text = "St. Kilian audio coming soon!"
 
         self.userSession.lastToken = token
         self.userSession.lastTrack = homilyUrl

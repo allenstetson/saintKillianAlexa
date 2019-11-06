@@ -1,6 +1,6 @@
 # ==============================================================================
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 # ==============================================================================
 """Module containing objects that represent events which take place at times."""
 
@@ -25,7 +25,7 @@ from ask_sdk_model.interfaces.audioplayer import (
 from ask_sdk_model.ui.image import Image
 
 # local imports
-import killian_data
+import kilian_data
 
 # Set up LOGGER object and logging level:
 LOGGER = logging.getLogger()
@@ -39,7 +39,7 @@ class Calendar:
     """Object for managing calendar events like Oktoberfest, etc.
 
     Args:
-        userSession (session.KillianUserSession): The current session manager.
+        userSession (session.KilianUserSession): The current session manager.
 
     """
     def __init__(self, userSession):
@@ -71,7 +71,7 @@ class Calendar:
         url = "https://st-killian-resources.s3.amazonaws.com/calendarGeneric_mixdown.mp3"
         token = "calendarGeneric_mixdown"
         speech = ""
-        title = "St. Killian calendar events"
+        title = "St. Kilian calendar events"
         text = "Calendar events coming soon! Watch the bulletin for news."
         self.userSession.lastToken = token
         self.userSession.lastTrack = url
@@ -120,7 +120,7 @@ class Calendar:
         """
 
 
-        dataManager = killian_data.KillianDataManager()
+        dataManager = kilian_data.KilianDataManager()
         items = dataManager.getCalendarEvents()
         if not items:
             items = dataManager.getCalendarEvents(monthOffset=1)
@@ -178,7 +178,7 @@ class Confession:
             N/A
 
         """
-        dataManager = killian_data.KillianDataManager()
+        dataManager = kilian_data.KilianDataManager()
         items = dataManager.getConfessions()
         LOGGER.info("items found: {}".format(items))
 
@@ -302,7 +302,7 @@ class MassDay:
         self.dayEnum = None
         self.dayName = None
 
-        self.dataManager = killian_data.KillianDataManager()
+        self.dataManager = kilian_data.KilianDataManager()
         self.daySpoken = dayName
         self.resolveDayFromName(dayName)
 
@@ -439,7 +439,7 @@ class MassResponse:
     """Object that forms responses to queries involving Masses.
 
     Args:
-        userSession (session.KillianUserSession): The current session manager.
+        userSession (session.KilianUserSession): The current session manager.
 
     """
     def __init__(self, userSession):
@@ -537,7 +537,7 @@ class MassResponse:
             the chosen Mass along with the language that it will be given in.
 
         """
-        dataManager = killian_data.KillianDataManager()
+        dataManager = kilian_data.KilianDataManager()
         today = datetime.datetime.now(tz=pytz.utc)
         timezone = pytz.timezone("America/Los_Angeles")
         todayLocal = today.astimezone(timezone)

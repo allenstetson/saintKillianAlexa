@@ -1,11 +1,11 @@
 ###############################################################################
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 ###############################################################################
-"""Application for Amazon Alexa devices: "Saint Killian".
+"""Application for Amazon Alexa devices: "Saint Kilian".
 
 Sample phrases:
- * Alexa, open Saint Killian
+ * Alexa, open Saint Kilian
  * When is the next mass
  * When is mass on Sunday
  * When is confession
@@ -85,7 +85,7 @@ from ask_sdk_core.dispatch_components.exception_components import(
 import audio
 import display
 import events
-import killian_data
+import kilian_data
 import session
 
 sb = StandardSkillBuilder()
@@ -154,7 +154,7 @@ class CalendarEventHandler(AbstractRequestHandler):
                 device.
 
         """
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         implemented = False
         if implemented:
@@ -261,7 +261,7 @@ class LatestHomilyHandler(AbstractRequestHandler):
                 device.
 
         """
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         homily = audio.Homily(userSession)
         speech, title, text, directive, sessionAttrs = \
             homily.getLatestHomily()
@@ -300,7 +300,7 @@ class MassTimeHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("__In MassTimeHandler__")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         mass = events.MassResponse(userSession)
         speech, reprompt, cardTitle, cardText, cardImage, displayText = \
@@ -365,7 +365,7 @@ class NextMassHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("In NextMassHandler")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         # Get response:
         envelope = handler_input.request_envelope
         speech, reprompt, cardTitle, cardText, cardImage, displayText = \
@@ -466,7 +466,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         DEV_MODE = False
         speech = ""
         LOGGER.info("Running NotifyNextMassHandler")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         negativeResponses = ["nah", "nope", "no thank you", "no thanks", "no"]
 
@@ -498,7 +498,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         # If no permissions
         if not (permissions and permissions.consent_token):
             LOGGER.info("user hasn't granted reminder permission")
-            speech = "Please give Saint Killian permissions to set reminders"
+            speech = "Please give Saint Kilian permissions to set reminders"
             speech += " using your Alexa app."
             permissions = ["alexa::alerts:reminders:skill:readwrite"]
             card = AskForPermissionsConsentCard(permissions=permissions)
@@ -513,7 +513,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             LOGGER.info("no next mass found for today")
             speech = "Sorry, but it looks like there are no more masses today."
             cardText = "No more masses today.\nTry again tomorrow."
-            card = SimpleCard("St. Killian - Mass Reminder", cardText)
+            card = SimpleCard("St. Kilian - Mass Reminder", cardText)
             return responseBuilder.speak(speech).set_card(card) \
                 .set_should_end_session(True).response
 
@@ -531,7 +531,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             left = int(((todayEvent - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
             card = SimpleCard(
-                "St. Killian - Mass Reminder",
+                "St. Kilian - Mass Reminder",
                 "Reminder set for Mass."
             )
             return responseBuilder.speak(speech).set_card(card) \
@@ -573,7 +573,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         if hour > 12:
             hour = hour - 12
         speech = speech.format(hour, minute, suffix)
-        card = SimpleCard("St. Killian", "Reminder set for Mass.")
+        card = SimpleCard("St. Kilian", "Reminder set for Mass.")
         return responseBuilder.speak(speech).set_card(card) \
             .set_should_end_session(True).response
 
@@ -665,7 +665,7 @@ class ExceptionHandler(AbstractExceptionHandler):
         LOGGER.error("EXCEPTION!: {}".format(exception))
         speech = "Sorry, I've encountered an error in my code. "
         speech += "If this problem persists, "
-        speech += "please inform the Saint Killian parish office."
+        speech += "please inform the Saint Kilian parish office."
         reprompt = "I didn't catch that. What can I help you with?"
         return handler_input.response_builder.speak(speech).ask(
             reprompt).response
@@ -717,7 +717,7 @@ class HelpIntentHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("In HelpIntentHandler")
-        speech = "Saint Killian can help you with the following requests. "
+        speech = "Saint Kilian can help you with the following requests. "
         speech += "What time is mass? When is mass on Sunday? "
         speech += "When is the next mass? Remind me to go to mass. "
         speech += "When is confession? "
@@ -863,7 +863,7 @@ class AudioPlaybackStoppedHandler(AbstractRequestHandler):
         LOGGER.info(msg)
 
         oim = handler_input.request_envelope.request.offset_in_milliseconds
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         userSession.offsetInMilliseconds = oim
         userSession.savePersistentAttrs()
 
@@ -928,7 +928,7 @@ class AudioResumeIntentHandler(AbstractRequestHandler):
         msg = "Resuming audio playback..."
         LOGGER.info(msg)
 
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         track = userSession.lastTrack
         token = userSession.lastToken
         offsetInMilliseconds = userSession.offsetInMilliseconds
@@ -982,7 +982,7 @@ class AudioStartOverIntentHandler(AbstractRequestHandler):
 
         """
         userId = handler_input.request_envelope.context.system.user.user_id
-        dataMan = killian_data.KillianDataManager()
+        dataMan = kilian_data.KilianDataManager()
         dbEntry = dataMan.getUserDatabaseEntry(userId)
         track = dbEntry.get("lastTrack")
         token = dbEntry.get("lastToken")
@@ -1050,7 +1050,7 @@ class AudioStopIntentHandler(AbstractRequestHandler):
         if audioPlayer.to_dict().get("player_activity") == "STOPPED":
             LOGGER.info("Audio player has been stopped.")
             oim = audioPlayer.to_dict().get("offset_in_milliseconds", 0)
-            userSession = session.KillianUserSession(handler_input)
+            userSession = session.KilianUserSession(handler_input)
             userSession.offsetInMilliseconds = oim
             LOGGER.info("Saving offset of {} milliseconds".format(oim))
             userSession.savePersistentAttrs()
@@ -1143,9 +1143,9 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
 # =============================================================================
 def getParishPhoneResponse():
     """Generate spoken response to phone number query"""
-    speech = "The phone number for the Saint Killian Parish Office is, "
+    speech = "The phone number for the Saint Kilian Parish Office is, "
 
-    dataManager = killian_data.KillianDataManager()
+    dataManager = kilian_data.KilianDataManager()
     number = dataManager.getParishOfficePhoneNumber()
     speech += ", ".join(number)
     reprompt = "Try asking: when is the next Mass."
@@ -1163,13 +1163,13 @@ def getParishPhoneResponse():
 
 def getWelcomeResponse():
     """Generate generic welcome response upon initial startup."""
-    #speech = "Welcome to Saint Killian Parish, Mission Viejo. "
+    #speech = "Welcome to Saint Kilian Parish, Mission Viejo. "
     speech = "<speak>"
     speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '
     speech += "How may I be of service?"
     speech += "</speak>"
     reprompt = "Try asking: when is the next Mass."
-    title = "St. Killian Parish, Mission Viejo"
+    title = "St. Kilian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"
     cardImage = None
     return speech, reprompt, title, text, cardImage
