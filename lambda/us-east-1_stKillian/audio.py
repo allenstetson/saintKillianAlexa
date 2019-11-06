@@ -14,7 +14,7 @@ import kilian_data
 import session
 
 
-__all__ = ["Homily"]
+__all__ = ["Homily", "Talk"]
 
 
 class Homily:
@@ -57,6 +57,51 @@ class Homily:
                 ),
                 metadata=AudioItemMetadata(
                     title="Latest Homily",
+                    subtitle=text
+                )
+            )
+        )
+        return speech, title, text, directive, sessionAttrs
+
+
+class Talk:
+    """Object representing recorded talks to be played by request."""
+    def __init__(self, userSession):
+        self.userSession = userSession
+
+    def getLatestTalk(self):
+        """Determine the latest recorded talk & return a directive for it."""
+        dataMan = kilian_data.KilianDataManager()
+        talk = dataMan.getLatestTalk()
+        talkUrl = talk['url']
+        token = talk['namespace']
+
+        talkDate = datetime.date(item["eventYear"], item["eventMonth"], item["eventDay"])
+        speech = "Okay. Here is a talk from  "
+        speech += "{}".format(talkDate.strftime("%A, %B %d, %Y"))
+        title = "St. Kilian: Latest Talk"
+        text = talk['eventTitle']
+
+        self.userSession.lastToken = token
+        self.userSession.lastTrack = talkUrl
+        self.userSession.savePersistentAttrs()
+
+        sessionAttrs = {
+            "lastTrack": talkUrl,
+            "lastToken": token
+        }
+
+        directive = PlayDirective(
+            play_behavior=PlayBehavior.REPLACE_ALL,
+            audio_item=AudioItem(
+                stream=Stream(
+                    expected_previous_token=None,
+                    token=token,
+                    url=talkUrl,
+                    offset_in_milliseconds=0
+                ),
+                metadata=AudioItemMetadata(
+                    title="Latest Talk",
                     subtitle=text
                 )
             )

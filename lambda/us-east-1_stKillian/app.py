@@ -275,6 +275,49 @@ class LatestHomilyHandler(AbstractRequestHandler):
         return handler_input.response_builder.response
 
 
+class LatestTalkHandler(AbstractRequestHandler):
+    """Object responding to initial requests.
+
+    Triggers playback of the latest talk. Initializes AudioPlayer, ends the
+    session.
+
+    """
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled.
+
+        Sample phrases: "Play the latest talk", "Play the newest talk"
+
+        """
+        return is_intent_name("LatestTalkIntent")(handler_input)
+
+    def handle(self, handler_input):
+        """Handle the intent; fetch and serve appropriate response.
+
+        Ends the current session with an audio directive.
+
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Returns:
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
+
+        """
+        userSession = session.KilianUserSession(handler_input)
+        talk = audio.Talk(userSession)
+        speech, title, text, directive, sessionAttrs = \
+            talk.getLatestTalk()
+
+        card = StandardCard(title=title, text=text)
+        handler_input.response_builder.speak(speech)
+        handler_input.response_builder.set_card(card)
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        handler_input.attributes_manager.session_attributes = sessionAttrs
+        return handler_input.response_builder.response
+
+
 class MassTimeHandler(AbstractRequestHandler):
     """Object handling all initial requests. Handles MassTimeIntent."""
     def can_handle(self, handler_input):

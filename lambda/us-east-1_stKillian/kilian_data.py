@@ -350,6 +350,48 @@ class KilianDataManager:
         dayEnum = eventDate.weekday()
         return self.getMassTimesByEnum(dayEnum)
 
+    def getLatestTalk(self):
+        """Gets the newest talk from the database.
+
+        Returns:
+            dict: The record for the latest talk.
+
+        """
+        msg = "Attempting to retrieve the latest talk from db"
+        LOGGER.info(msg)
+
+        # Query the database
+        #  NOTE: the 'scan' operation in dynamodb is expensive. If the DB ever
+        #  grows to a very large size (10k+), this will be a bad solution.
+        #  However, more elegant solutions rely on knowing the keyname of the
+        #  DB entry which is impossible in our current schema.
+        items = []
+        try:
+            filterExp = Key("eventCategory").eq("talk")
+            response = self.dbTable.scan(
+                FilterExpression=filterExp,
+            )
+            LOGGER.info("response: {}".format(response))
+            # If no items are found:
+            if response['Count'] == 0:
+                LOGGER.info("No items found for query.")
+                return []
+            # Store found items
+            items = response['Items']
+        # If DB query raises an error:
+        except ClientError as e:
+            LOGGER.info("query for holy day by date failed.")
+            LOGGER.error(e.response['Error']['Message'])
+            return []
+
+        itemsByDate = {}
+        for item in items:
+            itemDate = datetime.date(item["eventYear"], item["eventMonth"], item["eventDay"])
+            itemsByDate[itemDate] = item
+
+        return itemsByDate[sorted(itemsByDate)[-1]]
+
+
     def getMassTimesByEnum(self, dayEnum):
         """Gets mass times for a specific day of the week.
 
