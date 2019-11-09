@@ -41,7 +41,7 @@ class KilianDataManager:
             region_name="us-east-1",
             endpoint_url="http://dynamodb.us-east-1.amazonaws.com"
         )
-        self.dbTable = self.dynamodb.Table("StKilian")
+        self.dbTable = self.dynamodb.Table("StKilian")  # pylint: disable=E1101
 
     def getCalendarEvents(self, monthOffset=0):
         """Gets upcoming calendar events for this month.
@@ -380,7 +380,7 @@ class KilianDataManager:
             items = response['Items']
         # If DB query raises an error:
         except ClientError as e:
-            LOGGER.info("query for holy day by date failed.")
+            LOGGER.info("query for talks failed.")
             LOGGER.error(e.response['Error']['Message'])
             return []
 

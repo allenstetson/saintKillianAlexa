@@ -78,9 +78,12 @@ from ask_sdk_model.ui import (
     SimpleCard,
     StandardCard
 )
-from ask_sdk_core.dispatch_components.exception_components import(
-    AbstractExceptionHandler
-)
+## Not sure why this import is different from line 34;
+## commenting to see what happens:
+#from ask_sdk_core.dispatch_components.exception_components import(
+#    AbstractExceptionHandler
+#)
+
 # Local imports
 import audio
 import display
@@ -214,8 +217,8 @@ class ConfessionHandler(AbstractRequestHandler):
 
         # Display directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -358,8 +361,8 @@ class MassTimeHandler(AbstractRequestHandler):
 
         # Display Directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -450,8 +453,8 @@ class NextMassHandler(AbstractRequestHandler):
         )
         # Display Directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -665,8 +668,8 @@ class CancelAndStopIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled."""
         return not (not is_intent_name("AMAZON.CancelIntent")(handler_input)
-                and not is_intent_name("AMAZON.StopIntent")(handler_input)
-                and not is_intent_name("AMAZON.PauseIntent")(handler_input))
+                    and not is_intent_name("AMAZON.StopIntent")(handler_input)
+                    and not is_intent_name("AMAZON.PauseIntent")(handler_input))
 
     def handle(self, handler_input):
         """Handle the request; fetch and serve appropriate response.
@@ -1208,7 +1211,7 @@ def getWelcomeResponse():
     """Generate generic welcome response upon initial startup."""
     #speech = "Welcome to Saint Kilian Parish, Mission Viejo. "
     speech = "<speak>"
-    speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '
+    speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '  # pylint: disable=C0301
     speech += "How may I be of service?"
     speech += "</speak>"
     reprompt = "Try asking: when is the next Mass."
