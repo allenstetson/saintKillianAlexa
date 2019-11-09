@@ -4,6 +4,9 @@
 ###############################################################################
 """Module for serving audio directives for appropriate requests."""
 
+# Std imports
+import datetime
+
 # ASK imports
 from ask_sdk_model.interfaces.audioplayer import (
     PlayDirective, PlayBehavior, AudioItem, Stream, AudioItemMetadata,
@@ -24,8 +27,8 @@ class Homily:
 
     def getLatestHomily(self):
         """Determine the latest recorded homily & return a directive for it."""
-        #homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"
-        homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/killianGeneric_mixdown.mp3"
+        #homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/06-17-19_TheChristianLifeIsLikeAJob.mp3"  # pylint: disable=C0301
+        homilyUrl = "https://st-killian-resources.s3.amazonaws.com/homilies/killianGeneric_mixdown.mp3"  # pylint: disable=C0301
         #token = "06-17-19_TheChristianLifeIsLikeAJob"
         token = "kilianGeneric_mixdown"
 
@@ -76,7 +79,7 @@ class Talk:
         talkUrl = talk['url']
         token = talk['namespace']
 
-        talkDate = datetime.date(item["eventYear"], item["eventMonth"], item["eventDay"])
+        talkDate = datetime.date(talk["eventYear"], talk["eventMonth"], talk["eventDay"])
         speech = "Okay. Here is a talk from  "
         speech += "{}".format(talkDate.strftime("%A, %B %d, %Y"))
         title = "St. Kilian: Latest Talk"

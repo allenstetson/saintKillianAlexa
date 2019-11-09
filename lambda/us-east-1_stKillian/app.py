@@ -714,7 +714,7 @@ class ExceptionHandler(AbstractExceptionHandler):
         speech += "please inform the Saint Kilian parish office."
         reprompt = "I didn't catch that. What can I help you with?"
         return handler_input.response_builder.speak(speech).ask(
-            reprompt).response
+            reprompt).set_should_end_session(True).response
 
 
 class FallbackIntentHandler(AbstractRequestHandler):
@@ -1240,6 +1240,7 @@ sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(LatestHomilyHandler())
+sb.add_request_handler(LatestTalkHandler())
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(MassTimeHandler())
 sb.add_request_handler(NextMassHandler())

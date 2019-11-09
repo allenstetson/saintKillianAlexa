@@ -559,6 +559,7 @@ class MassResponse:
 
         # Iterate through the Masses looking for the first one that is after
         #  now.
+        language = "english"
         i = 0
         bestMass = times[i][0]
         while nowTime > bestMass:
