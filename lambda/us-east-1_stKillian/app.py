@@ -420,12 +420,16 @@ class NextMassHandler(AbstractRequestHandler):
         # If mass, prompt for a reminder; if not, return response.
         nextMass = events.MassResponse(userSession).getNextMass()
         if nextMass:
+            msg = "Found a 'next mass' for today, constructing reminder request"
+            LOGGER.debug(msg)
             speech += (". Would you like me to remind you "
                        "30 minutes prior to mass?")
             handler_input.response_builder.speak(speech).ask(reprompt).set_card(
                 StandardCard(title=cardTitle, text=cardText, image=cardImage)
             ).set_should_end_session(False)
             #currentIntent = envelope.request.intent
+            msg = "Reprompt message constructed. Now constructing nextIntent"
+            LOGGER.debug(msg)
             nextIntent = Intent(
                 name="NotifyNextMassIntent",
                 confirmation_status=IntentConfirmationStatus.NONE,
@@ -439,14 +443,21 @@ class NextMassHandler(AbstractRequestHandler):
             #handler_input.response_builder.add_directive(
             #    DelegateDirective(updated_intent=nextIntent)
             #)
+            msg = "nextMass constructed, now adding ElicitSlotDirective"
+            LOGGER.debug(msg)
             handler_input.response_builder.add_directive(
                 ElicitSlotDirective(
                     slot_to_elicit="DESIRES_REMINDER",
                     updated_intent=nextIntent
                 )
             )
+            msg = "Asking user if they want a reminder, and queuing follow-up intent."
+            LOGGER.info(msg)
+            msg = "Response looks like: \n{}".format(handler_input.response_builder.response)
+            LOGGER.debug(msg)
             return handler_input.response_builder.response
 
+        LOGGER.debug("No 'next mass' found for today. No reminder.")
         # No next mass, so ... no reminder needed:
         handler_input.response_builder.speak(speech).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
@@ -551,9 +562,14 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             return responseBuilder.speak(speech).set_card(card).response
 
         # Else, let's set up the reminder
-        LOGGER.info("Necessary permissions found. Creating reminder.")
+        msg = "Necessary permissions found. Creating reminder."
+        print(msg)
+        LOGGER.info(msg)
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
         massTime = events.MassResponse(userSession).getNextMass()
+        msg = "massTime getNextMass query returned"
+        print(msg)
+        LOGGER.debug(msg)
         # If no more masses today:
         if not massTime:
             LOGGER.info("no next mass found for today")
@@ -564,12 +580,18 @@ class NotifyNextMassHandler(AbstractRequestHandler):
                 .set_should_end_session(True).response
 
         # Good, a mass was found. Convert it to the local timezone.
+        msg = "Mass found. Converting to local timezone"
+        print(msg)
+        LOGGER.debug(msg)
         massTime = massTime["time"]
         todayEvent = datetime.datetime.combine(now, massTime)
         reminderTime = todayEvent - datetime.timedelta(minutes=30)
         timezone = pytz.timezone("America/Los_Angeles")
         reminderTime = timezone.localize(reminderTime)
         todayEvent = timezone.localize(todayEvent)
+        msg = "Upcoming event, local time, is {}".format(todayEvent)
+        print(msg)
+        LOGGER.debug(msg)
         # Are we within 30 minutes before it starts? If so, apologize and bail.
         if reminderTime < now and not DEV_MODE:
             LOGGER.info("too late. reminder is in the past.")
@@ -588,20 +610,36 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             reminderTime = now + datetime.timedelta(minutes=+1)
 
         # Build and invoke the response:
+        msg = "Building response"
+        print(msg)
+        LOGGER.debug(msg)
         reminderString = reminderTime.strftime("%Y-%m-%dT%H:%M:%S")
         trigger = Trigger(TriggerType.SCHEDULED_ABSOLUTE, reminderString,
                           time_zone_id="America/Los_Angeles")
         msg = "It is time to leave for mass."
         markup = "<speak>{}</speak>".format(msg)
         reminderSpeech = SpokenText(locale="en-US", ssml=markup, text=msg)
-        alertInfo = AlertInfo(SpokenInfo([reminderSpeech]))
+        alertInfo = AlertInfo(SpokenInfo(content=[reminderSpeech]))
         pushNotification = PushNotification(PushNotificationStatus.ENABLED)
-        reminderRequest = ReminderRequest(reminderTime, trigger, alertInfo,
-                                          pushNotification)
+        reminderRequest = ReminderRequest(
+            request_time=reminderTime,
+            trigger=trigger,
+            alert_info=alertInfo,
+            push_notification=pushNotification
+        )
         try:
-            reminderService.create_reminder(reminderRequest)
+            LOGGER.debug("creating reminder...")
+            print("creating reminder...")
+            reminderService.create_reminder(reminder_request=reminderRequest)
+            LOGGER.debug("reminder created.")
         except ServiceException as e:
+            msg = "An error occurred while creating reminder from\n{}"
+            msg = msg.format(reminderRequest)
+            print(msg)
+            LOGGER.error(msg)
             LOGGER.error(e)
+            if hasattr(e, "message"):
+                LOGGER.error(e.message)
             raise e
 
         # Build the speech response:
@@ -620,6 +658,8 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             hour = hour - 12
         speech = speech.format(hour, minute, suffix)
         card = SimpleCard("St. Kilian", "Reminder set for Mass.")
+        msg = "returning final response."
+        print(msg)
         return responseBuilder.speak(speech).set_card(card) \
             .set_should_end_session(True).response
 

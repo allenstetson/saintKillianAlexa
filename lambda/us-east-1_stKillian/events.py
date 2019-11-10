@@ -566,7 +566,7 @@ class MassResponse:
             i += 1
             bestMass = times[i][0]
             language = times[i][1]
-        print("-- Chosen Mass {}".format(bestMass))
+        print("-- Chosen Mass {} ({})".format(bestMass, language))
         return {"time": bestMass, "language": language}
 
     def getNextMassResponse(self):
