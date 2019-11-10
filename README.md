@@ -1,7 +1,7 @@
 # saintKillianAlexa
 Alexa skill for St. Killian Parish, Mission Viejo, CA
 
-![](./killian-celtic-logo.jpg "St. Killian - Alexa skill")
+![](./kilian-celtic-logo.jpg "St. Killian - Alexa skill")
 
 * [Purpose](#purpose)
 * [Usage](#usage)
@@ -11,7 +11,7 @@ Alexa skill for St. Killian Parish, Mission Viejo, CA
   * [audio.py](#audio)
   * [display.py](#display)
   * [events.py](#events)
-  * [killian_data.py](#killian_data)
+  * [kilian_data.py](#kilian_data)
   * [session.py](#session)
 * [Back End](#back-end)
 * [Future Work](#future-work)
@@ -58,7 +58,7 @@ Several 3rd party packages are included in this installation. The following repr
 ##### events.py
 * This module contains logic for crafting responses for event-like things such as calendar events, Holy Days, Masses, Confession, etc. Each of things things is represented by an object which has methods representing requests that one might make of the thing -- _getNextMass_ or _getNextConfession_, etc.
 
-##### killian_data.py
+##### kilian_data.py
 * This module contains an object called KillianDataManager which is responsible for retrieving data from the DynamoDb database or populating those responses with defaults. Additionally it is the object that commits data to the database. Most of the time, data fetched is then massaged into valid datetime objects, or as lists in correct sort order (which may be alphabetical, or by date, or date relative to `datetime.now()`).
 
 ##### session.py

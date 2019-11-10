@@ -1,18 +1,18 @@
 # ==============================================================================
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 # ==============================================================================
 """Module containing helper object that tracks user session, id, attrs."""
 
-__all__ = ["KillianUserSession"]
+__all__ = ["KilianUserSession"]
 
 # ==============================================================================
 # Imports
 # ==============================================================================
 # local imports
-import killian_data
+import kilian_data
 
-class KillianUserSession:
+class KilianUserSession:
     """Object for tracking & accessing user data, session data, working with DB.
 
     Args:
@@ -21,7 +21,7 @@ class KillianUserSession:
 
     """
     def __init__(self, handler_input):
-        self._dataMan = killian_data.KillianDataManager()
+        self._dataMan = kilian_data.KilianDataManager()
         self._dbEntry = {}
         self._handlerInput = handler_input
         self._sessionAttributes = {}

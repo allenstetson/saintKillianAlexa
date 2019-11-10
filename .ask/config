@@ -21,9 +21,9 @@
             "arn": "arn:aws:lambda:us-east-1:681242437315:function:stKillian",
             "awsRegion": "us-east-1",
             "codeUri": "lambda/us-east-1_stKillian",
-            "functionName": "stKillian",
+            "functionName": "arn:aws:lambda:us-east-1:681242437315:function:stKillian",
             "handler": "app.handler",
-            "revisionId": "2dd630e3-8a01-4abf-b52a-cfd23c9134de",
+            "revisionId": "afe000f4-cacd-43e1-9725-75f8829b4e3d",
             "runtime": "python3.7"
           }
         ]

@@ -1,6 +1,6 @@
 ###############################################################################
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 ###############################################################################
 """Module for assembling display directives."""
 
@@ -17,14 +17,14 @@ from ask_sdk_model.interfaces.display.plain_text import PlainText
 from ask_sdk_model.interfaces.display.rich_text import RichText
 
 class Directive:
-    """Display Directive generator for Saint Killian.
+    """Display Directive generator for Saint Kilian.
 
     Args:
         mainUrl (str): The URL to the main, smaller, image to display.
 
         backgroundUrl (str): The URL to the image to display in the BG.
 
-        title (str): The title to display ("Saint Killian -" will be added)
+        title (str): The title to display ("Saint Kilian -" will be added)
 
         text (str): The body of the text; richText supported.
 
@@ -68,7 +68,7 @@ class Directive:
         bodyTemplate = BodyTemplate2(
             background_image=backgroundImage,
             image=mainImage,
-            title="St. Killian - " + self.title,
+            title="St. Kilian - " + self.title,
             text_content=textContent
         )
         displayDirective = RenderTemplateDirective(template=bodyTemplate)

@@ -1,11 +1,11 @@
 ###############################################################################
 # Copywrite Allen Stetson (allen.stetson@gmail.com) with permissions for
-# authorized representitives of St. Killian Parish, Mission Viejo, CA.
+# authorized representitives of St. Kilian Parish, Mission Viejo, CA.
 ###############################################################################
-"""Application for Amazon Alexa devices: "Saint Killian".
+"""Application for Amazon Alexa devices: "Saint Kilian".
 
 Sample phrases:
- * Alexa, open Saint Killian
+ * Alexa, open Saint Kilian
  * When is the next mass
  * When is mass on Sunday
  * When is confession
@@ -78,14 +78,17 @@ from ask_sdk_model.ui import (
     SimpleCard,
     StandardCard
 )
-from ask_sdk_core.dispatch_components.exception_components import(
-    AbstractExceptionHandler
-)
+## Not sure why this import is different from line 34;
+## commenting to see what happens:
+#from ask_sdk_core.dispatch_components.exception_components import(
+#    AbstractExceptionHandler
+#)
+
 # Local imports
 import audio
 import display
 import events
-import killian_data
+import kilian_data
 import session
 
 sb = StandardSkillBuilder()
@@ -154,7 +157,7 @@ class CalendarEventHandler(AbstractRequestHandler):
                 device.
 
         """
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         implemented = False
         if implemented:
@@ -214,8 +217,8 @@ class ConfessionHandler(AbstractRequestHandler):
 
         # Display directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/rosary_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -261,10 +264,53 @@ class LatestHomilyHandler(AbstractRequestHandler):
                 device.
 
         """
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         homily = audio.Homily(userSession)
         speech, title, text, directive, sessionAttrs = \
             homily.getLatestHomily()
+
+        card = StandardCard(title=title, text=text)
+        handler_input.response_builder.speak(speech)
+        handler_input.response_builder.set_card(card)
+        handler_input.response_builder.add_directive(directive)
+        handler_input.response_builder.set_should_end_session(True)
+        handler_input.attributes_manager.session_attributes = sessionAttrs
+        return handler_input.response_builder.response
+
+
+class LatestTalkHandler(AbstractRequestHandler):
+    """Object responding to initial requests.
+
+    Triggers playback of the latest talk. Initializes AudioPlayer, ends the
+    session.
+
+    """
+    def can_handle(self, handler_input):
+        """Inform the request handler of what intents can be handled.
+
+        Sample phrases: "Play the latest talk", "Play the newest talk"
+
+        """
+        return is_intent_name("LatestTalkIntent")(handler_input)
+
+    def handle(self, handler_input):
+        """Handle the intent; fetch and serve appropriate response.
+
+        Ends the current session with an audio directive.
+
+        Args:
+            handler_input (ask_sdk_core.handler_input.HandlerInput):
+                Input from Alexa.
+
+        Returns:
+            ask_sdk_model.response.Response: Response for this intent and
+                device.
+
+        """
+        userSession = session.KilianUserSession(handler_input)
+        talk = audio.Talk(userSession)
+        speech, title, text, directive, sessionAttrs = \
+            talk.getLatestTalk()
 
         card = StandardCard(title=title, text=text)
         handler_input.response_builder.speak(speech)
@@ -300,7 +346,7 @@ class MassTimeHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("__In MassTimeHandler__")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         mass = events.MassResponse(userSession)
         speech, reprompt, cardTitle, cardText, cardImage, displayText = \
@@ -315,8 +361,8 @@ class MassTimeHandler(AbstractRequestHandler):
 
         # Display Directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -365,7 +411,7 @@ class NextMassHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("In NextMassHandler")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         # Get response:
         envelope = handler_input.request_envelope
         speech, reprompt, cardTitle, cardText, cardImage, displayText = \
@@ -374,12 +420,16 @@ class NextMassHandler(AbstractRequestHandler):
         # If mass, prompt for a reminder; if not, return response.
         nextMass = events.MassResponse(userSession).getNextMass()
         if nextMass:
+            msg = "Found a 'next mass' for today, constructing reminder request"
+            LOGGER.debug(msg)
             speech += (". Would you like me to remind you "
                        "30 minutes prior to mass?")
             handler_input.response_builder.speak(speech).ask(reprompt).set_card(
                 StandardCard(title=cardTitle, text=cardText, image=cardImage)
             ).set_should_end_session(False)
             #currentIntent = envelope.request.intent
+            msg = "Reprompt message constructed. Now constructing nextIntent"
+            LOGGER.debug(msg)
             nextIntent = Intent(
                 name="NotifyNextMassIntent",
                 confirmation_status=IntentConfirmationStatus.NONE,
@@ -393,22 +443,29 @@ class NextMassHandler(AbstractRequestHandler):
             #handler_input.response_builder.add_directive(
             #    DelegateDirective(updated_intent=nextIntent)
             #)
+            msg = "nextMass constructed, now adding ElicitSlotDirective"
+            LOGGER.debug(msg)
             handler_input.response_builder.add_directive(
                 ElicitSlotDirective(
                     slot_to_elicit="DESIRES_REMINDER",
                     updated_intent=nextIntent
                 )
             )
+            msg = "Asking user if they want a reminder, and queuing follow-up intent."
+            LOGGER.info(msg)
+            msg = "Response looks like: \n{}".format(handler_input.response_builder.response)
+            LOGGER.debug(msg)
             return handler_input.response_builder.response
 
+        LOGGER.debug("No 'next mass' found for today. No reminder.")
         # No next mass, so ... no reminder needed:
         handler_input.response_builder.speak(speech).set_card(
             StandardCard(title=cardTitle, text=cardText, image=cardImage)
         )
         # Display Directive for display devices (Echo Show, etc):
         directiveBuilder = display.Directive(
-            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",
-            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",
+            mainUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/massGifts_340.jpg",  # pylint: disable=C0301
+            backgroundUrl="https://st-killian-resources.s3.amazonaws.com/displayTemplateMedia/dispBG_512.jpg",  # pylint: disable=C0301
             title=cardTitle,
             text=displayText
         )
@@ -466,7 +523,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         DEV_MODE = False
         speech = ""
         LOGGER.info("Running NotifyNextMassHandler")
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
 
         negativeResponses = ["nah", "nope", "no thank you", "no thanks", "no"]
 
@@ -498,32 +555,43 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         # If no permissions
         if not (permissions and permissions.consent_token):
             LOGGER.info("user hasn't granted reminder permission")
-            speech = "Please give Saint Killian permissions to set reminders"
+            speech = "Please give Saint Kilian permissions to set reminders"
             speech += " using your Alexa app."
             permissions = ["alexa::alerts:reminders:skill:readwrite"]
             card = AskForPermissionsConsentCard(permissions=permissions)
             return responseBuilder.speak(speech).set_card(card).response
 
         # Else, let's set up the reminder
-        LOGGER.info("Necessary permissions found. Creating reminder.")
+        msg = "Necessary permissions found. Creating reminder."
+        print(msg)
+        LOGGER.info(msg)
         now = datetime.datetime.now(pytz.timezone("America/Los_Angeles"))
         massTime = events.MassResponse(userSession).getNextMass()
+        msg = "massTime getNextMass query returned"
+        print(msg)
+        LOGGER.debug(msg)
         # If no more masses today:
         if not massTime:
             LOGGER.info("no next mass found for today")
             speech = "Sorry, but it looks like there are no more masses today."
             cardText = "No more masses today.\nTry again tomorrow."
-            card = SimpleCard("St. Killian - Mass Reminder", cardText)
+            card = SimpleCard("St. Kilian - Mass Reminder", cardText)
             return responseBuilder.speak(speech).set_card(card) \
                 .set_should_end_session(True).response
 
         # Good, a mass was found. Convert it to the local timezone.
+        msg = "Mass found. Converting to local timezone"
+        print(msg)
+        LOGGER.debug(msg)
         massTime = massTime["time"]
         todayEvent = datetime.datetime.combine(now, massTime)
         reminderTime = todayEvent - datetime.timedelta(minutes=30)
         timezone = pytz.timezone("America/Los_Angeles")
         reminderTime = timezone.localize(reminderTime)
         todayEvent = timezone.localize(todayEvent)
+        msg = "Upcoming event, local time, is {}".format(todayEvent)
+        print(msg)
+        LOGGER.debug(msg)
         # Are we within 30 minutes before it starts? If so, apologize and bail.
         if reminderTime < now and not DEV_MODE:
             LOGGER.info("too late. reminder is in the past.")
@@ -531,7 +599,7 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             left = int(((todayEvent - now).seconds) / 60)
             speech += "You only have {} minutes left until Mass.".format(left)
             card = SimpleCard(
-                "St. Killian - Mass Reminder",
+                "St. Kilian - Mass Reminder",
                 "Reminder set for Mass."
             )
             return responseBuilder.speak(speech).set_card(card) \
@@ -542,20 +610,36 @@ class NotifyNextMassHandler(AbstractRequestHandler):
             reminderTime = now + datetime.timedelta(minutes=+1)
 
         # Build and invoke the response:
+        msg = "Building response"
+        print(msg)
+        LOGGER.debug(msg)
         reminderString = reminderTime.strftime("%Y-%m-%dT%H:%M:%S")
         trigger = Trigger(TriggerType.SCHEDULED_ABSOLUTE, reminderString,
                           time_zone_id="America/Los_Angeles")
         msg = "It is time to leave for mass."
         markup = "<speak>{}</speak>".format(msg)
         reminderSpeech = SpokenText(locale="en-US", ssml=markup, text=msg)
-        alertInfo = AlertInfo(SpokenInfo([reminderSpeech]))
+        alertInfo = AlertInfo(SpokenInfo(content=[reminderSpeech]))
         pushNotification = PushNotification(PushNotificationStatus.ENABLED)
-        reminderRequest = ReminderRequest(reminderTime, trigger, alertInfo,
-                                          pushNotification)
+        reminderRequest = ReminderRequest(
+            request_time=reminderTime,
+            trigger=trigger,
+            alert_info=alertInfo,
+            push_notification=pushNotification
+        )
         try:
-            reminderService.create_reminder(reminderRequest)
+            LOGGER.debug("creating reminder...")
+            print("creating reminder...")
+            reminderService.create_reminder(reminder_request=reminderRequest)
+            LOGGER.debug("reminder created.")
         except ServiceException as e:
+            msg = "An error occurred while creating reminder from\n{}"
+            msg = msg.format(reminderRequest)
+            print(msg)
+            LOGGER.error(msg)
             LOGGER.error(e)
+            if hasattr(e, "message"):
+                LOGGER.error(e.message)
             raise e
 
         # Build the speech response:
@@ -573,7 +657,9 @@ class NotifyNextMassHandler(AbstractRequestHandler):
         if hour > 12:
             hour = hour - 12
         speech = speech.format(hour, minute, suffix)
-        card = SimpleCard("St. Killian", "Reminder set for Mass.")
+        card = SimpleCard("St. Kilian", "Reminder set for Mass.")
+        msg = "returning final response."
+        print(msg)
         return responseBuilder.speak(speech).set_card(card) \
             .set_should_end_session(True).response
 
@@ -622,8 +708,8 @@ class CancelAndStopIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         """Inform the request handler of what intents can be handled."""
         return not (not is_intent_name("AMAZON.CancelIntent")(handler_input)
-                and not is_intent_name("AMAZON.StopIntent")(handler_input)
-                and not is_intent_name("AMAZON.PauseIntent")(handler_input))
+                    and not is_intent_name("AMAZON.StopIntent")(handler_input)
+                    and not is_intent_name("AMAZON.PauseIntent")(handler_input))
 
     def handle(self, handler_input):
         """Handle the request; fetch and serve appropriate response.
@@ -665,10 +751,10 @@ class ExceptionHandler(AbstractExceptionHandler):
         LOGGER.error("EXCEPTION!: {}".format(exception))
         speech = "Sorry, I've encountered an error in my code. "
         speech += "If this problem persists, "
-        speech += "please inform the Saint Killian parish office."
+        speech += "please inform the Saint Kilian parish office."
         reprompt = "I didn't catch that. What can I help you with?"
         return handler_input.response_builder.speak(speech).ask(
-            reprompt).response
+            reprompt).set_should_end_session(True).response
 
 
 class FallbackIntentHandler(AbstractRequestHandler):
@@ -717,7 +803,7 @@ class HelpIntentHandler(AbstractRequestHandler):
 
         """
         LOGGER.info("In HelpIntentHandler")
-        speech = "Saint Killian can help you with the following requests. "
+        speech = "Saint Kilian can help you with the following requests. "
         speech += "What time is mass? When is mass on Sunday? "
         speech += "When is the next mass? Remind me to go to mass. "
         speech += "When is confession? "
@@ -863,7 +949,7 @@ class AudioPlaybackStoppedHandler(AbstractRequestHandler):
         LOGGER.info(msg)
 
         oim = handler_input.request_envelope.request.offset_in_milliseconds
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         userSession.offsetInMilliseconds = oim
         userSession.savePersistentAttrs()
 
@@ -928,7 +1014,7 @@ class AudioResumeIntentHandler(AbstractRequestHandler):
         msg = "Resuming audio playback..."
         LOGGER.info(msg)
 
-        userSession = session.KillianUserSession(handler_input)
+        userSession = session.KilianUserSession(handler_input)
         track = userSession.lastTrack
         token = userSession.lastToken
         offsetInMilliseconds = userSession.offsetInMilliseconds
@@ -982,7 +1068,7 @@ class AudioStartOverIntentHandler(AbstractRequestHandler):
 
         """
         userId = handler_input.request_envelope.context.system.user.user_id
-        dataMan = killian_data.KillianDataManager()
+        dataMan = kilian_data.KilianDataManager()
         dbEntry = dataMan.getUserDatabaseEntry(userId)
         track = dbEntry.get("lastTrack")
         token = dbEntry.get("lastToken")
@@ -1050,7 +1136,7 @@ class AudioStopIntentHandler(AbstractRequestHandler):
         if audioPlayer.to_dict().get("player_activity") == "STOPPED":
             LOGGER.info("Audio player has been stopped.")
             oim = audioPlayer.to_dict().get("offset_in_milliseconds", 0)
-            userSession = session.KillianUserSession(handler_input)
+            userSession = session.KilianUserSession(handler_input)
             userSession.offsetInMilliseconds = oim
             LOGGER.info("Saving offset of {} milliseconds".format(oim))
             userSession.savePersistentAttrs()
@@ -1143,9 +1229,9 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
 # =============================================================================
 def getParishPhoneResponse():
     """Generate spoken response to phone number query"""
-    speech = "The phone number for the Saint Killian Parish Office is, "
+    speech = "The phone number for the Saint Kilian Parish Office is, "
 
-    dataManager = killian_data.KillianDataManager()
+    dataManager = kilian_data.KilianDataManager()
     number = dataManager.getParishOfficePhoneNumber()
     speech += ", ".join(number)
     reprompt = "Try asking: when is the next Mass."
@@ -1163,13 +1249,13 @@ def getParishPhoneResponse():
 
 def getWelcomeResponse():
     """Generate generic welcome response upon initial startup."""
-    #speech = "Welcome to Saint Killian Parish, Mission Viejo. "
+    #speech = "Welcome to Saint Kilian Parish, Mission Viejo. "
     speech = "<speak>"
-    speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '
+    speech += '<audio src="https://st-killian-resources.s3.amazonaws.com/killianWelcome01_ssml.mp3"></audio> '  # pylint: disable=C0301
     speech += "How may I be of service?"
     speech += "</speak>"
     reprompt = "Try asking: when is the next Mass."
-    title = "St. Killian Parish, Mission Viejo"
+    title = "St. Kilian Parish, Mission Viejo"
     text = "Try asking 'When is the next mass?'"
     cardImage = None
     return speech, reprompt, title, text, cardImage
@@ -1194,6 +1280,7 @@ sb.add_request_handler(CancelAndStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(LatestHomilyHandler())
+sb.add_request_handler(LatestTalkHandler())
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(MassTimeHandler())
 sb.add_request_handler(NextMassHandler())
