@@ -76,12 +76,12 @@ Access to the back end is highly restricted, and permissions must be explicitly 
 The back end is currently hosted for free based on the $100 monthly credits earned through customer interaction and awarded by Amazon.
 
 #### Future Work
-* Once recorded homilies come online, we will need to store them in Dynamo with metadata including their S3 URL, not hard-coded for playback.
-* The calendar invocation (as of v1.0.0), simply plays a "Coming soon" audio track. Once a shared calendar is set up, with an API, logic must be added to query the calendar, report the results, and set up reminders for events.
-* "When is the next holy day" -- should be easily implemented, given all that is currently available.
-* Announcements framework for announcing big events, fundraisers, parties, etc upon initial startup.
-* Holiday greetings ("Blessed Christmas from Saint Killian Parish", etc.)
-* Personal greetings recorded by our clergy and/or staff.
-* Web app for managing masses and holy days (_Very Important!_)
-* Web app for managing events (_Important_)
-* Web app for uploading recorded homilies, etc (_Important)
+- [ ] Once recorded homilies come online, we will need to store them in Dynamo with metadata including their S3 URL, not hard-coded for playback.
+- [ ] The calendar invocation (as of v1.0.0), simply plays a "Coming soon" audio track. Once a shared calendar is set up, with an API, logic must be added to query the calendar, report the results, and set up reminders for events.
+- [ ] "When is the next holy day" -- should be easily implemented, given all that is currently available.
+- [ ] Announcements framework for announcing big events, fundraisers, parties, etc upon initial startup.
+- [ ] Holiday greetings ("Blessed Christmas from Saint Killian Parish", etc.)
+- [ ] Personal greetings recorded by our clergy and/or staff.
+- [ ] Web app for managing masses and holy days (_Very Important!_)
+- [ ] Web app for managing events (_Important_)
+- [ ] Web app for uploading recorded homilies, etc (_Important)
